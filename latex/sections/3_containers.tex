@@ -1,0 +1,283 @@
+%  Practical MLOps
+\section{MLOps for Containers and Edge Devices}
+Although virtual machines are here to stay, it is increasingly
+important to grasp two types of technologies for model
+deployments: containers and edge devices.
+
+In the following, we explain the following concepts:
+container, container image, container runtime. We will
+also see how to create a container with Docker.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%  https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/
+The context is the development of a ML application that has
+three main components - a React frontend, a Python API, and a
+PostgreSQL database. If you wanted to work on this project,
+you'd have to install Node, Python, and PostgreSQL.
+How do you make sure you have the same versions as the other
+developers on your team? Or your CI/CD system? Or what's
+used in production?
+\footnote{
+    How do you ensure the version of Python
+    (or Node or the database) your app needs isn't affected
+    by what's already on your machine? How do you manage
+    potential conflicts?
+}
+
+Enter containers! What is a container?
+\footnote{
+    In short, containers are all about the application itself,
+    and only what the application is (like the source code
+    and other supporting files) versus what it needs to run
+    (like databases).
+}
+Simply put, containers
+are isolated processes for each of your app's components.
+Each component - the frontend React app, the Python API engine,
+and the database - runs in its own isolated environment,
+completely isolated from everything else on your machine.
+
+Some properties that make containers awesome are
+\footnote{
+    \textbf{Containers versus virtual machines (VMs)}
+
+    Without getting too deep, a VM is an entire operating
+    system with its own kernel, hardware drivers, programs,
+    and applications. Spinning up a VM only to isolate a
+    single application is a lot of overhead.
+
+    A container is simply an isolated process with all of
+    the files it needs to run. If you run multiple containers,
+    they all share the same kernel, allowing you to run more
+    applications on less infrastructure.
+
+    Quite often, you will see containers and VMs used together.
+}:
+\begin{itemize}
+    \item \textbf{Self-contained.} Each container has everything
+    it needs to function with no reliance on any pre-installed
+    dependencies on the host machine.
+
+    \item \textbf{Isolated.} Since containers are run in isolation,
+    they have minimal influence on the host and other containers,
+    increasing the security of your applications.
+
+    \item \textbf{Independent.} Each container is independently
+    managed. Deleting one container won't affect any others.
+
+    \item \textbf{Portable.} Containers can run anywhere!
+    The container that runs on your development machine will
+    work the same way in a data center or anywhere in the cloud!
+\end{itemize}
+
+
+
+\subsection*{What is a Container Image?}
+Seeing a container is an isolated process, where does it get its
+files and configuration? How do you share those environments?
+
+That's where container images come in. A container image is a
+standardized package that includes all of the files, binaries,
+libraries, and configurations to run a container.
+
+There are two important principles of images:
+\begin{enumerate}
+    \item  Images are immutable. Once an image is created, it
+    can't be modified. You can only make a new image or add
+    changes on top of it.
+
+    \item Container images are composed of layers. Each layer
+    represents a set of file system changes that add, remove,
+    or modify files.
+\end{enumerate}
+
+
+
+\subsection*{What is Container Runtime?}
+Since Docker (the company) initially developed the tooling to
+create, manage, and run containers, it became common to say
+“Docker container.” The runtime, that is the required software
+to run a container  in a system, was also created by Docker.
+
+A few years after the new container technology's initial release,
+Red Hat (the company behind the RHEL operating system)
+contributed to making a different way to run containers, with a
+new (alternative) runtime environment. This new environment
+also brought a new set of tools to operate containers, with some
+compatibility with those provided by Docker. If you ever hear
+about container runtime, you have to be aware that there is more 
+han one.
+
+
+
+
+%  https://docs.docker.com/reference/dockerfile/
+\subsection*{Creating a Container}
+The Dockerfile is at the heart of creating containers.
+Anytime you are creating a container, you must have the
+Dockerfile present in the current directory. This special
+file can have several sections and commands that allow
+creating a container image.
+
+Docker runs instructions in a Dockerfile in order.
+A Dockerfile must begin with a FROM instruction. 
+The FROM instruction specifies the base image from which
+you are building 
+\footnote{
+    e.g. 
+
+    FROM python:3.9
+
+    WORKDIR /app
+
+    COPY requirements.txt
+
+    RUN pip install --no-cache-dir -r requirements.txt
+
+    COPY . .
+}.
+
+Now build the container from the same directory where
+the Dockerfile is by using the command docker build.
+Make sure you start a build pointing to where the
+Dockerfile is present. In this case, I'm in the same
+directory, so I use a dot to let the build know that
+the current directory is the one to build from.
+
+This way of building images is not very robust and has a
+few problems. First, it is challenging to identify this
+image later. All we have is the sha256 digest to reference
+it and nothing else.
+
+It is a good practice to tag it when building the
+image. This is how you create the same image and tag it:
+
+docker build -t localbuild:removeme
+
+The critical difference is that now localbuild has a tag
+of removeme and it will show up when listing the images.
+
+The answer to “How do I install your software?”
+can now be “just pull the container” for almost anything.
+
+
+\subsection*{Running a Container}
+Now that the container builds with the Dockerfile, we
+can run it.
+
+
+
+
+
+\subsection*{Best Practices}
+\begin{itemize}
+    \item Use a Linter  (e.g hadolint).
+    
+    \item Since one of the goals of containerizing tools
+    is to keep them as small as possible, you can
+    accomplish a couple of things when creating aDockerfile.
+    Every time there is a RUN instruction, a new layer gets
+    created with that execution. Containers consist of
+    individual layers, so the fewer the number of layers,
+    the smaller the container's size. This means that it is
+    preferable to use a single line to install many
+    dependencies instead of one.
+
+    \item Another critical piece of building containers is
+    making sure there aren't vulnerabilities associated
+    with the software installed. It is not uncommon to find
+    engineers who think that the application is unlikely
+    to have vulnerabilities because they write highquality
+    code. The problem is that a container comes with
+    preinstalled libraries. It is a full operating system
+    that, at build time, will pull extra dependencies to
+    satisfy the application you are trying to deliver.
+
+    \item Many different solutions specialize in scanning and
+    reporting vulnerabilities in containers to mitigate these
+    vulnerabilities. These security tools scan a library that
+    your application installs and the operating system's
+    packages, providing a detailed and accurate vulnerability
+    report.
+
+    One solution that is very fast and easy to install is
+    Anchore's grype command line tool.
+
+    A useful automation enhancement is to fail on a specific
+    vulnerability level, such as high:
+
+    This is another check that you can automate along with
+    linting for robust container building. A well-written
+    Dockerfile with constant reporting on vulnerabilities is
+    an excellent way to enhance containerized models'
+    production delivery.
+\end{itemize}
+
+
+
+
+
+
+\subsection*{Serving a Trained Model Over HTTP}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Edge Devices}
+
+
+
+
+
+
+
+
+
+\subsection{Containers for Managed ML Systems}
+
+

@@ -1,0 +1,205 @@
+\section{Create a Plan}
+Many ML projects are doomed from the start due to a misalignment between product
+metrics and model metrics. More projects fail by producing good models that
+aren't helpful for a product rather than due to modeling difficulties.
+
+\
+
+\subsection{Measuring Success}
+We have three potential approaches for increasing the complexity of ML models
+\footnote{
+    It is important to also realize that even features that could benefit from
+    ML can often simply use a heuristic for their first version. Once the
+    heuristic is being used, you may even realize that you do not need ML at all.
+}:
+\begin{enumerate}
+    \item[1.] Baseline, design heuristics based on domain knowledge.
+    \item[2.] Simple Model. 
+    \item[3.] Complex Model.
+\end{enumerate} 
+All of these approaches are different and may evolve as we learn more from
+prototypes along the way, but when working on ML, you should define a common
+set of metrics to compare the success of modeling pipelines.
+
+To that end, we will cover four categories of performance that have a
+large impact on the usefulness of any ML product: business metrics,
+model metrics, freshness, and speed. Clearly defining these metrics will
+allow us to accurately measure the performance of each iteration.
+
+\begin{itemize}
+    \item \textbf{Business Performance}
+    
+    \noindent
+    Once the product or feature goal is clear, a metric should be defined
+    to judge its success. This metric should be separate from any model
+    metrics and only be a reflection of the product's success
+    \footnote{
+        Product metrics may be as simple as the number of users a feature
+        attracts or more nuanced such as the click-through rate (CTR) of
+        the recommendations we provide.
+    }.
+
+    Product metrics are ultimately the only ones that matter, as they
+    represent the goals of your product or feature. All other metrics
+    should be used as tools to improve product metrics
+    \footnote{
+        Product metrics, however, do not need to be unique. While most
+        projects tend to focus on improving one product metric, their
+        impact is often measured in terms of multiple metrics,
+        including guardrail metrics, metrics that shouldn't decline
+        below a given point.
+    }. 
+
+
+    \item \textbf{Model Performance}
+    
+    \noindent
+    The ultimate product metric that determines the success of a model
+    is the proportion of visitors who use the output of a model out of
+    all the visitors who could benefit from it.
+
+    When a product is still being built and not deployed yet, it is not
+    possible to measure usage metrics. To still measure progress, it is
+    important to define a separate success metric called an offline
+    metric or a model metric.
+
+    Small changes to the interaction between the model and product can
+    make it possible to use a more straightforward modeling approach
+    and deliver results more reliably
+    \footnote{e.g. Changing an interface so that a model's results can
+    be omitted if they are below aconfidence threshold; Presenting a
+    few other predictions or heuristics in addition to a model's top
+    prediction; Communicating to users that a model is still in an
+    experimental phase and giving them opportunities to provide feedback
+    }.
+
+
+    \item \textbf{Freshness and Distribution Shift}
+    
+    \noindent
+    Even if a model is trained on an adequate dataset, many problems have
+    a distribution of data that changes as time goes on. When the distribution
+    of the data shifts, the model often needs to change as well in order to
+    maintain the same level of performance. In general, a model can perform
+    well on data it hasn't seen before as long as it is similar enough to
+    the data it was exposed to during training.
+
+    Not all problems have the same freshness requirements.
+
+    Depending on your business problem, you should consider how hard it will
+    be to keep models fresh. How often will you need to retrain models, and
+    how much will it cost you each time we do so?
+
+
+    \item \textbf{Speed}
+    
+    \noindent
+    Ideally, a model should deliver a prediction quickly. This allows users
+    to interact with it more easily and makes it easier to serve a model to
+    many concurrent users. So how fast does a model need to be?
+
+
+\end{itemize}
+
+
+
+\subsection{Estimate Scope and Challenges}
+In ML, success generally requires understanding the context of the task well,
+acquiring a good dataset, and building an appropriate model. Let's elaborate.
+
+\begin{itemize}
+    \item \textbf{Leverage Domain Expertise}
+    
+    \noindent
+    The simplest model we can start with is a heuristic: a good rule of thumb based on
+    knowledge of the problem and the data. The best way to devise heuristics is to see
+    what experts are currently doing. Most practical applications are not entirely novel.
+    How do people currently solve the problem you are trying to solve?
+
+    The second best way to devise heuristics is to look at your data. Based on your dataset,
+    how would you solve this task if you were doing it manually?
+
+    To identify good heuristics, I recommend either learning from experts in the field or
+    getting familiar with the data.
+
+
+    \item \textbf{Stand on the Shoulders of Giants}
+    
+    \noindent
+
+    Have people solved similar problems? If so, the best way to get started is to understand
+    and reproduce existing results. Look for public implementations either with
+    similar models or similar datasets, or both.
+
+\end{itemize}
+Leveraging existing open code and datasets can help make
+implementation faster. In the worst case, if none of the existing models performs well
+on an open dataset, you now at least know that this project will require significant
+modeling and/or data collection work.
+
+If you have found an existing model that solves a similar task and managed to train it
+on the dataset it was originally trained on, all that is left is to adapt it to your domain.
+To do so, I recommend going through the following successive steps:
+\begin{enumerate}
+    \item[1.] Find a similar open source model, ideally paired with a dataset it was trained on,
+    and attempt to reproduce the training results yourself.
+
+    \item[2.] Once you have reproduced the results, find a dataset that is closer to your use
+    case, and attempt to train the previous model on that dataset.
+
+    \item[3.] Once you have integrated the dataset to the training code, it is time to judge how
+    your model is doing using the metrics you defined and start iterating.
+\end{enumerate}
+
+
+
+\subsection{To Make Regular Progress: Start Simple}
+It is worth repeating that much of the challenge in ML is similar to one
+of the biggest challenges in software—resisting the urge to build pieces
+that are not needed yet.
+
+Many ML projects fail because they rely on an initial data acquisition and
+model building plan and do not regularly evaluate and update this plan.
+
+Because of the stochastic nature of ML, it is extremely hard to predict how
+far a given dataset or model will get us.
+
+For that reason, it is vital to start with the simplest model that could
+address your requirements, build an end-to-end prototype including this
+model, and judge its performance not simply in terms of optimization metrics
+but in terms of your product goal.
+
+\subsection*{Start with a Simple Pipeline}
+To do this, we will need to build a pipeline that can take data in and
+return results. For most ML problems, there are actually two separate
+pipelines to consider:
+\begin{enumerate}
+    \item[i. Training] 
+    
+    A training pipeline ingests all of the labeled data you would like
+    to train on and passes it to a model. It then trains said model on
+    the dataset until it reaches satisfactory performance.
+    
+    Most often, a training pipeline is used to train multiple models
+    and compare their performance on a held-out validation set.
+
+
+    \item[ii. Inference/Prediction] 
+
+    At a high level, an inference pipeline starts by accepting input
+    data and preprocessing it.
+    
+    The preprocessing phase usually consists of multiple steps. Most
+    commonly, these steps will include cleaning and validating the
+    input, generating features a model needs, and formatting the data
+    to a numerical representation appropriate for an ML model.
+    
+    Pipelines in more complex systems also often need to fetch
+    additional information the model needs such as user features
+    stored in a database.
+
+
+    \item[iii. Evaluation]
+    
+    From the predictions, what can we improve?
+\end{enumerate}

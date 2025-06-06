@@ -1,0 +1,222 @@
+% DMLS
+\section{Model Development}
+Given the large set of candidate models, the basic
+question of model development is
+\footnote{
+    One thing is certain, the best framework for model
+    development is closely related to DevOps. Meaning that
+    a process of continous integration and delivery.
+}: 
+What is the best model for the task and requirements
+at hand?
+
+Time and compute power are limited resources,
+and you have to be strategic about what models you
+select. When selecting a model for your problem,
+you don't choose from every possible model out there,
+but usually focus on a set of models suitable for your
+problem. Starting from simple models is very likely
+a good idea.
+
+Knowledge of common ML tasks and the typical approaches
+to solve them is essential in this process
+\footnote{
+    To understand different algorithms, the best way is to
+    equip yourself with basic ML knowledge and run experiments
+    with the algorithms you're interested in. To keep up to
+    date with so many new ML techniques and models, I find
+    it helpful to monitor trends at major ML conferences
+    such as NeurIPS, ICLR, and ICML, as well as following
+    researchers whose work has a high signal-to-noise ratio
+    on Twitter
+}.
+Also, there may be models that are better in certain
+requirements but not all of the requirements at the same time.
+
+
+
+\subsection{6 Tips for Model Selection}
+
+\begin{enumerate}
+    \item \text{Avoid the State-of-the-art Trap.} Find 
+    reasonable models that can tackle the task.
+
+    \item \text{Start Simple.} Find  simple models
+    that can tackle the task. Simple models are usually
+    simpler to improve, deploy, debug and maintain.
+    Simple models algo serve as a baseline.
+
+    \item \text{Avoid Human Biases.} No preference for
+    models, it is a job to be done.
+
+    \item \text{Evaluate Model Staleness.} If enough data
+    is available, evaluate how models learn or perform over
+    time
+    \footnote{
+        Tracking or logging model learning may be a good idea
+        to confirm the model is indeed learning.
+    }.
+
+    \item \text{Evaluate Trade-offs} and their implications
+    to the computing/scientific/economic
+    \footnote{
+        or other goals.
+    } importance.
+
+    \item \text{Understand the Models' Assumptions} to confirm the
+    models under consideration are reasonable.
+
+\end{enumerate}
+
+
+
+\subsection{Ensembles}
+
+
+
+
+\subsection{Experiment Tracking and Versioning}
+During the model dev, it is frequent to experiment with many
+architectures and models. It is important to track what's
+going on during training not only to detect and address
+issues but also to evaluate whether your model is learning
+anything useful.
+
+The process of tracking the progress
+and results of an experiment is called experiment tracking
+\footnote{
+    Many tools originally set out to be experiment tracking
+    tools, such as MLflow and Weights & Biases, have grown
+    to incorporate versioning, and vice-versa.
+}.
+The process of logging all the details of an experiment for
+the purpose of possibly recreating it later or comparing it
+with other experiments is called versioning.
+
+
+
+
+\subsection*{Experiment Tracking}
+Like we already mentioned, it is important to track what's
+going on during training not only to detect and address
+issues but also to evaluate whether your model is learning
+anything useful.
+
+Some things to consider tracking are:
+\begin{itemize}
+    \item The loss curve corresponding to the train split
+    and each of the eval splits.
+
+    \item The model performance metrics that you care about
+    on all nontest splits.
+
+    \item The speed of your model, evaluated by the number
+    of steps per second or, if your data is text, the number
+    of tokens processed per second.
+
+    \item System performance metrics such as memory usage
+    and CPU/GPU utilization. They're important to identify
+     bottlenecks and avoid wasting system resources.
+
+    \item The values over time of any parameter and
+    hyperparameters.
+\end{itemize}
+In theory
+\footnote{
+    However, in practice, due to the limitations of
+    tooling today, it can be overwhelming to track too
+    many things, and tracking less important things can
+    distract you from tracking what is really important.
+},
+it's not a bad idea to track everything you can.
+Most of the time, you probably don't need to look at most
+of them. But when something does happen, one or more of
+them might give you clues to understand and/or debug your
+model.
+
+Experiment tracking enables comparison across experiments.
+By observing how a certain change in a component affects
+the model's performance, you gain some understanding into
+what that component does.
+
+
+
+\subsection*{Versioning}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Distributed Training}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{AutoML}
+
+
+
+

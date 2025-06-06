@@ -1,0 +1,182 @@
+% Ameisen, 2020.
+\section{Debugging ML Models}
+Getting a pipeline to a satisfactory level of
+performance is hard and requires multiple iterations.
+We will cover tools to debug
+\footnote{
+    Software best practices encourage practitioners
+    to regularly test, validate, and inspect their
+    code. This should be no different for ML, where
+    errors in a model can be much harder to detect
+    than in traditional software.
+}
+modeling pipelines and
+ways to write tests to make sure they stay working
+once we start changing them.
+
+
+
+\subsection{Software Best Practices}
+For most ML projects, you will repeat the process
+of building a model, analyzing its shortcomings, and
+addressing them multiple times. You are also likely
+to change each part of your infrastructure more than
+once, so it is crucial to find methods to increase
+iteration speed. In ML just like with any other
+software project, you should follow time-tested
+software best practices
+\footnote{
+    Most of them can be applied to ML projects with
+    no modifications, such as building only what you
+    need, often referred to as the Keep It Stupid
+    Simple (KISS) principle.
+
+    
+}.
+
+ML projects are iterative in nature and go through
+many different iterations of data cleaning and feature
+generation algorithms, as well as model choices.
+Two areas often end up slowing down iteration speed:
+debugging and testing.
+
+Many resources exist to help you learn how to debug
+general programs, such as the University of Chicago's
+concise debugging guide. If, like most ML practitioners,
+your language of choice is Python, I recommend looking
+through the Python documentation for pdb, the standard
+library debugger.
+
+
+
+\subsection{ML-Specific Best Practices}
+When it comes to ML more than any type of software,
+merely having a program execute end-to-end is not
+sufficient to be convinced of its correctness. An
+entire pipeline can run with no errors and produce
+an entirely useless model.
+
+If your modeling pipeline performs poorly, how can
+you know whether it is due to the quality of a model
+or the presence of a bug earlier in the process?
+The best way to tackle these problems in ML is to
+follow a progressive approach
+\footnote{  
+    There are certain points in the Data Flow that
+    have a high potential for inspecting the passing 
+    of data in the ML system.
+}:
+\begin{itemize}
+    \item \textbf{Validate the Data Flow.}
+    
+    \noindent
+    The simplest way to do this is by taking a very
+    small subset of data and verifying that it can
+    flow all the way through your pipeline.
+
+    The goal of this initial step is to verify that
+    you are able to ingest data, transform it in
+    the right format, pass it to a model, and have
+    the model output something correct. At this
+    stage, you aren't judging whether your model
+    can learn something, just whether the pipeline
+    can let data through.
+
+    The vast majority of errors that can come up at
+    this initial stage relate to data mismatch: the
+    data you are loading and preprocessing is fed to
+    your model in a format that it cannot accept.
+
+    A simple but somewhat general list of tasks are:
+    \begin{itemize}
+        \item Whether \textbf{loading} from disk or
+        an API, verify that data is formatted as
+        required or expected.
+
+        Verify that the attributes, missing values,
+        range of expected values are all correct.
+        If working with non-structured data, is the
+        data correct given the expectations?
+
+        \item Verify all the required pre-processing
+        \footnote{
+            e.g. data cleaning, feature engineering,
+            formatting.
+        }
+        required to feed the data into the model is
+        being applied as required.
+
+        \item Check that the model's outputs are the
+        right type or shape.
+    \end{itemize}
+
+
+    \item \textbf{Validate the Learning Capacity.}
+    
+    \noindent
+    If we have chosen our model appropriately, it
+    should have the capacity to learn from our
+    dataset.
+
+    Some cases of mismatch can be more elusive
+    and lead to silent failure
+    \footnote{
+        A pipeline fed values that are not in the
+        correct range or shape may still run but
+        would produce a poorly performing model.
+        Models that require normalized data will
+        often still train on nonnormalized data:
+        they simply will not be able to fit it in
+        a useful manner. Similarly, feeding a matrix
+        of the wrong shape to a model can cause
+        it to misinterpret the input and produce
+        incorrect outputs.
+    }.
+    Catching silent failure errors is harder, because
+    they silent failures manifest later in the process
+    once we evaluate the performance of a model. The
+    best way to proactively detect them is to visualize
+    data as you build your pipeline and build tests to
+    encode assumptions.
+
+    Test that after the data processing, the model is able
+    to train. Check the learning curve of the model.
+
+
+    \item \textbf{Validate Generalization.}
+    
+    \noindent
+    Generalization focuses on getting an ML model to work
+    well on data it has not seen before.
+
+    \begin{itemize}
+        \item Check for Data Leakage.
+        
+        \item Check for Overfitting. Use an appropriate
+        Cross-Validation strategy.
+    \end{itemize}
+
+    Consider using: regularization, data augmentation,
+    re-design of the data.
+\end{itemize}
+
+To systematize these validations software engineering
+best practices we talked about earlier come into play.
+It is time to isolate each part of this pipeline, and
+encode our observations into tests that we will be able
+to run as our pipeline changes, to validate it.
+
+
+
+
+
+% https://storage.googleapis.com/gweb-research2023-media/pubtools/4156.pdf
+% Ameisen, 2020.
+% \section{Testing Data Pipelines}
+
+% \begin{itemize}
+%     \item Test data ingestion.
+%     \item Test data processing.
+%     \item Test model outputs.
+% \end{itemize}
+

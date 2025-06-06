@@ -1,0 +1,155 @@
+\section{MLOps}
+
+
+
+\subsection{What Is MLOps?}
+Why isn't machine learning 10X faster?
+Most of the problem-building machine learning systems involve
+everything surrounding machine learning modeling: data engineering,
+data processing, problem feasibility, and business alignment.
+
+The quicker the feedback loop (Kaizen)
+\footnote{
+    What is Kaizen? In Japanese, it means improvement.
+    Using Kaizen as a software management philosophy originated in
+    the Japanese automobile industry after World War II. It
+    underlies many other techniques: Kanban, root cause analysis,
+    five why's, and Six Sigma.
+    
+    To practice Kaizen, an accurate and realistic assessment of
+    the world's state is necessary and pursues daily, incremental
+    improvements in the pursuit of excellence.
+}
+the more time to focus on business problems.
+
+The reason models are not moving into production is the impetus
+for the emergence of MLOps as a critical industry standard.
+MLOps shares a lineage with DevOps in that DevOps philosophically
+demands automation. A common expression is if it is not automated,
+it's broken. Similarly, with MLOps, there must not be components of
+the system that have humans as the levers of the machine
+\footnote{
+    The history of automation shows that humans are the least
+    valuable doing repetitive tasks but are the most valuable
+    using technology as the architects and practitioners.
+}.
+
+
+
+\subsection{An MLOps Hierarchy of Needs}
+An ML system is a software system, and software systems work
+efficiently and reliably when DevOps and data engineering best
+practices are in place.
+
+So how could it be possible to deliver the true potential of
+machine learning to an organization if DevOps' basic foundational
+rules don't exist or data engineering is not fully automated?
+
+
+The ML hierarchy of needs in the next list is not a definitive guide
+but is an excellent place to start a discussion.
+\begin{enumerate}
+    \item One of the major things holding back machine learning
+    projects is this necessary foundation of \textbf{DevOps}.
+
+    The foundation of DevOps is continuous integration. Without
+    automated testing, there is no way to move forward with DevOps.
+    Continuous integration is relatively painless for a Python
+    project with the modern tools available. The first step is to
+    build a "scaffolding" for a Python project which consists of:
+    a \textbf{MakeFile}, \textbf{Requirements(.txt)},
+    \textbf{code.py},  \textbf{test\_code.py}, \textbf{environment}
+    \footnote{
+        we recommend using conda for managing the environment and
+        generating the requirements file.
+    }.
+
+    One of the most straightforward ways to implement CI for this
+    Python scaffolding project is with \textbf{GitHub Actions}.
+
+    CD, i.e., automatically pushing the machine learning project
+    into production, would be the next logical step. This step
+    would involve deploying the code to a specific location using
+    a continuous delivery process and IaC (Infrastructure as Code).
+
+
+    \item After the DevOps foundation is complete, next is
+    \textbf{data automation}, that is, to automate the flow of data
+    \footnote{
+        e.g. with Apache Airflow, AWS Data Pipeline, AWS Guidelines,
+        SchemaChange.
+    }.
+
+    Some items to consider here are the data's size, the frequency
+    at which the information is changed, and how clean the data is.
+
+
+    \item After DevOps and automated data comes
+    \textbf{platform automation}, that is to evaluate is how an
+    organization can use high-level platforms to build ML solutions.
+    
+    An ML platform solves real-world repeatability, scale, and
+    operationalization problems.
+
+
+    \item Finally, sssuming all of these other layers are complete
+    (DevOps, Data Automation, and Platform Automation),
+    \textbf{ML automation}, or \textbf{MLOps}, is possible.
+
+    One way to articulate these best practices is to consider that
+    they create reproducible models with robust model packaging,
+    validation, and deployment. In addition, these enhance the
+    ability to explain and observe model performance.
+
+    The MLOps feedback loop includes the following:
+    \begin{itemize}
+        \item \textbf{Create and retrain models with reusable ML
+        Pipeline.}
+        
+        \noindent
+        Creating a model just once isn't enough. The data can
+        change, the customers can change, and the people making
+        the models can change. The solution is to have reusable
+        ML pipelines that are versioned.
+        
+
+        \item \textbf{Continuous Delivery of ML Models.}
+        
+        \noindent
+        CD of ML Models is similar to CD of software. When all of
+        the steps are automated, including the infrastructure,
+        using IaC, the model is deployable at any time to a new
+        environment, including production.
+
+
+        \item \textbf{Audit trail for MLOps pipeline.}
+        
+        \noindent
+        It is critical to have auditing for machine learning models.
+        There is no shortage of problems in machine learning,
+        including security, bias, and accuracy. Therefore,
+        having a helpful audit trail is invaluable, just as having
+        adequate logging is critical in production software engineering
+        projects. In addition, the audit trail is part of the
+        feedback loop where you continuously improve your approach
+        to the problem and the actual problem.
+        
+
+        \item \textbf{Monitor the model to improve future models.}
+        
+        \noindent
+        One of the unique aspects of machine learning is that the
+        data can literally "shift" beneath the model.
+
+    \end{itemize}
+
+
+
+\end{enumerate}
+The culmination of MLOps is a machine learning system that works.
+The people that work on operationalizing and building machine
+learning applications are machine learning engineers and/or data
+engineers.
+
+
+

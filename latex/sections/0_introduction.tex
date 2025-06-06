@@ -1,0 +1,516 @@
+% Ameisen, 2020
+\section{Finding the ML Approach}
+The ability to take a problem, estimate how best to solve it, 
+build a plan to tackle it with ML, and confidently execute on said
+plan. This is a skill that has to be learned through experience,
+after multiple overly ambitious projects and missed deadlines.
+
+The ML algorithm is only a small part of a ML system, other parts to 
+consider are:
+\begin{itemize}
+    \item The Product Goal or Business requirements
+    \footnote{
+        regarding the stakeholders' requirements, which are a must or a nice-to-have?
+    }.
+    \item The interface.
+    \item The data stack.
+    \item The development, monitoring and maintaining models.
+    \item The infrastructure.
+\end{itemize}
+
+
+
+
+
+% Building ML Powered Apps. Ameisen, 2020
+\subsection{From Product Goal to ML Framing}
+ML allows machines to learn from data and behave in a probabilistic
+way to solve problems by optimizing for a given objective. This
+stands in opposition to traditional programming, in which
+step-by-step instructions solve a problem. This makes ML
+particularly useful to build systems for which we are unable to
+define a heuristic solution.
+
+ML is powerful and can unlock entirely new products and services,
+but since it is based on pattern recognition, it introduces a
+level of uncertainty. It is important to identify which parts
+of a product would benefit from ML and how to frame a learning
+goal in a way that minimizes the risks of users having a poor
+experience.
+
+% Designing MLS. Huyen, 2022.
+ML can be solve a lot of problems, but not all. There are two
+necessary questions to ask when considering to use ML:
+\begin{itemize}
+    \item Is ML indispensable for a solution?
+    \item Is it cost effective?
+\end{itemize}
+ML solutions generally learn complex patterns from data to predict
+an unknown value
+\footnote{
+    Consider that insufficiently trained models come with bigger
+    risks. Some ML companies fake it until they make it by using
+    other tools.
+}.
+ML solutions shine if the problem:
+\begin{itemize}
+    \item is repetitive,
+    \item the cost of wrong predictions is cheap
+    \footnote{
+        ML might still be suitable if, on average, the benefits 
+        of correct predictions outweighs the cost of a wrong
+        prediction.
+    },
+    \item is at scale,
+    \item is somewhat stable,
+    \item can be divided and conquered with ML and other tools
+    \footnote{
+        e.g. a set of rules that can be programmed.
+    }.
+\end{itemize}
+ML should never be used if it is unethical to do so, or there are
+other simpler solutions, or if it is not and won't be cost effective.
+
+Consider the following examples where we identify the problem and
+a potential solution.
+
+% \begin{example}
+It is close to impossible for humans to write step-by-step
+instructions to automatically detect which animal is in an image
+based on pixel values. By feeding thousands of images of different
+animals to a convolutional neural network (CNN), however, we can
+build a model that performs this classification more accurately
+than a human. This makes it an attractive task to tackle with ML.
+% \end{example}
+
+% \begin{example}
+Consider an application that calculates your taxes automatically
+should rely on guidelines provided by the government. As you may
+have heard, having errors on your tax return is generally frowned
+upon. This makes the use of ML for automatically generating tax
+returns a dubious proposition.
+% \end{example}
+
+In summary, never use ML when you can solve your problem with a
+manageable set of deterministic rules, i.e., a set of rules that
+could be confidently written and that would not be too complex to
+maintain.
+
+
+
+% Designing MLS. Huyen, 2022.
+\subsection*{Product Goal Framing}
+The first thing to do is to understand why the system is needed.
+For businesses it must be driven by business objectives which
+translate into ML objectives that guide the development. Also, 
+the business objectives must be framed into a ML tasks
+\footnote{
+    Most businesses don't care about ML metrics, 
+    unless they impact business metrics. This discrepancy can kill
+    ML projects. The solution is to ask a lot of questions to
+    understand the business side and how it related to ML. Most 
+    businesses focus on maximizing profit or minimizing risks. So,
+    a ML project must support this directly or indirectly.
+
+    Remember that new ML metrics can always be defined and computed.
+    Be realistic about expected improvements.
+}.
+This reduces the difficulty of the problem.
+
+% https://developers.google.com/machine-learning/problem-framing/problem-framing
+\textbf{Problem framing} is the process of analyzing a problem to isolate
+the individual elements that need to be addressed to solve it
+\footnote{
+    Formal problem framing is the critical beginning for solving
+    an ML problem, as it forces us to better understand both the
+    problem and the data in order to design and build a bridge
+    between them. -TensorFlow engineer
+}.
+Problem framing helps determine your project's technical
+feasibility and provides a clear set of goals and success
+criteria. When considering an ML solution, effective problem
+framing can determine whether or not your product ultimately
+succeeds.
+
+% Designing MLS. Huyen, 2022.
+The process to design ML systems that meet the business requirements
+is iterative with continuous improvement and delivery
+\footnote{
+    Sometimes, a data scientist or ML engineer might spend less 
+    time in model development and more in setting up the 
+    infrastructure and related tasks.
+}.
+It is useful to identify the objectives, stakeholders and constraints.
+Make sure there is an allignment of stakeholders and objectives.
+Also, for a ML problem we need to precisely define the inputs,
+outputs, the business objective that guides the development
+and their relation to the ML tasks
+\footnote{
+    ML problems are tricky when there is a need to optimize for
+    several objective functions. An approach is to decouple
+    them. This makes model development and maintenance easier.
+}.
+% https://developers.google.com/machine-learning/problem-framing/problem-framing
+At a high level, ML problem framing consists of two distinct steps: 
+\begin{enumerate}
+    \item Determining whether ML is the right approach for solving
+    a problem.
+    \item Framing the problem in ML terms.
+\end{enumerate}
+%% Designing MLS. Huyen, 2022.
+If you can frame (a part of) the product goal as a
+learning problem, we unlock many possible solutions.
+For one product goal, there are usually many different
+ML formulations, with varying levels of implementation
+difficulty.
+
+
+
+% https://developers.google.com/machine-learning/problem-framing/problem-framing
+\subsection*{Understand the problem}
+To understand the problem, perform the following tasks:
+\begin{itemize}
+    \item \textbf{State the goal} for the product you are developing
+    or refactoring. Begin by stating your goal in non-ML terms.
+    The goal is the answer to the question,
+    "\textbf{What am I trying to accomplish?}"
+
+    When we build a product or a service, we start by the product or
+    service we want to deliver to users. On the other hand, ML
+    problems are framed in terms of learning a relationship from data.
+
+
+    \item \textbf{Evaluate Feasibility}, that is, determine if the
+    goal is best met using Statistics/ML/AI, or a non-ML solution
+    \footnote{
+        Be open to any approach whether it requires ML or not.
+
+        Some view ML as a universal tool that can be applied to
+        all problems. In reality, ML is a specialized tool
+        suitable only for particular problems. You don't want
+        to implement a complex ML solution when a simpler non-ML
+        solution will work.
+    }.
+    
+    All ML problems are not created equal! As our understanding of ML
+    has evolved, problems such as building a model to correctly
+    classify photos of cats and dogs have become solvable in a matter
+    of hours, while others, such as creating a system capable of
+    carrying out a conversation, remain open research  problems
+    \footnote{
+        To efficiently build ML applications, it is
+        important to consider multiple potential ML
+        framings and start with the ones we judge as
+        the simplest. One of the best ways to evaluate
+        the difficulty of an ML problem is by looking at
+        both the kind of data it requires and at the
+        existing models that could leverage said data.
+    }.
+
+
+    \item \textbf{Verify you have the data required} to train a model
+    if you're using a predictive ML approach.
+
+    Think about which kind of data you have available to you or could
+    gather. Oftentimes, data availability ends up being the limiting
+    factor in model selection.
+\end{itemize}
+Your choice of model type depends upon the specific context and
+constraints of your problem. The model's output should
+(at least help to) accomplish the goal.  Determining the goal
+and which kind of inputs your model will take in and which outputs
+it will produce will help you narrow down potential approaches
+significantly. Based on these types, any of the relevant categories
+of ML approaches could be a good fit. 
+
+
+
+\newpage
+\subsection*{Evaluating Data Feasibility.}
+To succesfully evaluate the feasibility of a ML project involves
+several key steps:
+\begin{enumerate}
+    \item [1.] \textbf{Understanding the Problem}
+    
+    \noindent
+    Define objectives, inputs, and outcomes.
+
+
+    \item [2.] \textbf{Data Collection and Masterization}
+    
+    \noindent
+    Identify \textbf{data sources}, required attributes, and datatypes.
+
+
+    \item [3.] \textbf{Data Quality}
+    
+    \noindent
+    Check if the data is:
+    \begin{itemize}
+        \item \textbf{complete} or if there are significant gaps; 
+        
+        \item \textbf{consistent and reliable}
+        \footnote{
+            e.g., a model will benefit from data gathered over
+            many years from the same reliable instruments.
+        }.
+        Having data that's consistently and reliably collected will
+        produce a better model. 
+        
+        \item \textbf{trusted}, that is, understand where your data
+        will come from. Will the data be from trusted sources you trust
+        \footnote{
+            like logs from your product, or will it be from sources you
+            don't have much insight into, like the output from another
+            ML system?
+        }?
+
+        \item \textbf{available} at prediction time in the correct format.
+        If it will be difficult to obtain certain feature values at
+        prediction time, omit those features from your datasets.
+
+        \item \textbf{accurate or correct}. In large datasets, it's
+        inevitable that some labels will have incorrect values,
+        but if more than a small percentage of labels are incorrect,
+        the model will produce poor predictions.
+
+        \item \textbf{representative} of the real world as possible.
+        Training on unrepresentative datasets can cause poor performance
+        when the model is asked to make real-world predictions.
+    \end{itemize}
+
+
+    \item [4.] \textbf{Availability or Abundance}
+    
+    \noindent
+
+    Ensure there is sufficient historical data to train and
+    validate the model. There are roughly three levels of data
+    availability, from best-case scenario to most challenging.
+    Unfortunately, as with most other tasks, you can generally
+    assume that the most useful type of data will be the hardest to
+    find.
+
+    \begin{itemize}
+        \item When working on a supervised model, finding a
+        \textbf{labeled dataset} is every practitioner's dream
+        \footnote{
+            Finding a labeled dataset that fits your needs and is
+            freely available on the web is rare in practice. It is
+            common, however, to mistake the dataset that you find
+            for the dataset that you need.
+        }.
+
+        \item Some datasets contain labels that are not exactly the
+        modeling target, but somewhat correlated with it.
+        
+        Interaction history is an example of a \textbf{weakly
+        labeled} dataset for predicting a user's preferences. Weak
+        labels are less precise by definition but often easier to
+        find than perfect labels.
+
+        \item In some cases, while we do not have a labeled dataset
+        mapping desired inputs to outputs, we at least have access
+        to a dataset containing relevant examples.
+        
+        This means we need to label the dataset, find a model
+        that can learn from unlabeled data, or do a little bit of
+        both.
+
+        \item In some cases we need to first \textbf{acquire it}.
+    \end{itemize}
+
+    \item[5.] \textbf{Data Processing} 
+    
+    \noindent
+    Evaluate the \textbf{data processing needs},
+    \textbf{pipeline feasibility}.
+
+    \item[6.] \textbf{Identify Risks}
+    
+    \noindent
+    Identify risks related to data, such as data breaches, changes
+    in data availability, or quality issues. Develop strategies to
+    mitigate these risks.
+
+\end{enumerate}
+Remember that datasets and models are iterative and start from
+simple. Also, it may be a requirement to evaluate the latency or
+ease of implementation.
+
+
+
+
+
+% https://developers.google.com/machine-learning/problem-framing/problem-framing
+\subsection{Clear use case for ML}
+Based on the input and output, ML systems can be divided into
+predictive and generative. 
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|l|l|l|}
+    \hline
+    \textbf{Category} & \textbf{Input} & \textbf{Output} & \textbf{Training Technique} \\ \hline
+    \textbf{Predictive ML} & \begin{tabular}[c]{@{}l@{}}Text\\ Image\\ Audio\\ Video\\ Numerical\end{tabular} & \begin{tabular}[c]{@{}l@{}}Makes a prediction, e.g., classifying an email as \\ spam or not spam, guessing tomorrow's rainfall,\\ or predicting the price of a stock. Output can be\\ verified against reality.\end{tabular} & \begin{tabular}[c]{@{}l@{}}Typically uses lots of data to train a supervised,\\ unsupervised, or reinforcement learning model\\ to perform a specific task.\end{tabular} \\ \hline
+    \textbf{Generative AI} & \begin{tabular}[c]{@{}l@{}}Text\\ Image\\ Audio\\ Video\\ Numerical\end{tabular} & \begin{tabular}[c]{@{}l@{}}Generates output based on the user's intent, \\ e.g., summarizing an article, or producing an audio\\ clip or short video.\end{tabular} & \begin{tabular}[c]{@{}l@{}}Typically uses lots of unlabeled data to train a \\ large language model or image generator to fill\\ in missing data. Can be fine-tuned by training\\ on labeled data for specific tasks, like classification.\end{tabular} \\ \hline
+    \end{tabular}
+    \caption{Comparison of Predictive ML and Generative AI}
+\end{table}
+
+There's no value in predicting something if you can't turn the
+prediction into an action that helps users
+\footnote{
+    For example, a model that predicts whether a user will find
+    a video useful should feed into an app that recommends
+    useful videos. A model that predicts whether it will rain
+    should feed into a weather app.
+}.
+That is, your product should take action from the model's output.
+
+Your choice of model type depends upon the specific context and
+constraints of your problem. The model's output should accomplish
+the task defined in the ideal outcome. Thus, the first question
+to answer is "What type of output do I need to solve my problem?"
+
+If you need to classify something or make a numeric prediction,
+you'll probably use predictive ML. If you need to generate new
+content or produce output related to natural language
+understanding, you'll probably use generative AI. The following
+tables list predictive ML and generative AI outputs:
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{Category} & \textbf{ML System} & \textbf{Example Output} \\ \hline
+    \textbf{Classification} & Binary & Classify an email as spam or not spam. \\ \hline
+    \textbf{} & Multiclass single-label & Classify an animal in an image. \\ \hline
+    \textbf{} & Multiclass multi-label & Classify all the animals in an image. \\ \hline
+    \textbf{Numerical} & Unidimensional regression & Predict the number of views a video will get. \\ \hline
+    \textbf{} & Multidimensional regression & Predict blood pressure, heart rate, and cholesterol levels for an individual. \\ \hline
+    \end{tabular}
+    \caption{Predictive ML Examples}
+\end{table}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|l|}
+    \hline
+    \textbf{Model Type} & \textbf{Example Output} \\ \hline
+    \textbf{Text} & \begin{tabular}[c]{@{}l@{}}Summarize an article.\\ Reply to customer reviews.\\ Translate documents from English to Mandarin.\\ Write product descriptions.\\ Analyze legal documents.\end{tabular} \\ \hline
+    \textbf{Image} & \begin{tabular}[c]{@{}l@{}}Produce marketing images.\\ Apply visual effects to photos.\\ Generate product design variations.\end{tabular} \\ \hline
+    \textbf{Audio} & \begin{tabular}[c]{@{}l@{}}Generate dialogue in a specific accent.\\ Generate a short musical composition in a specific genre, like jazz.\end{tabular} \\ \hline
+    \textbf{Video} & \begin{tabular}[c]{@{}l@{}}Generate realistic-looking videos.\\ Analyze video footage and apply visual effects.\end{tabular} \\ \hline
+    \textbf{Multimodal} & Produce multiple types of output, like a video with text captions. \\ \hline
+    \end{tabular}
+    \caption{Generative AI Model Types and Example Outputs}
+\end{table}
+
+
+
+
+
+% Designing ML Sys
+\subsection{Designing the ML System}
+Usually, there are 4 main complementary requirements for the devs
+of the ML system:
+\begin{enumerate}
+    \item \textbf{Reliability.}
+    
+    \noindent
+    The system should continue to perform the correct function at 
+    the desired level of performance even in the face of adversity
+    (e.g. hardware, software or human faults).
+
+    ML systems can fail silently and end users may not know it failed.
+    This can be very dangerous.
+
+
+    \item \textbf{Scalability.}
+    
+    \noindent
+    This can mean that the ML system can handle growth in complexity,
+    traffic volume, or model count. Whatever growth (or decrease)
+    is expected,  there should be reasonable ways of dealing and
+    managing the demands (e.g. a hundred models, where the
+    training and monitoring need to me automated).
+
+
+    \item \textbf{Maintainability.}
+    
+    \noindent
+    Different contributors can work using tools that they are
+    comfortable with instead of forcing tools onto other groups.
+
+    Code and common bugs should be documented. Code, data, and 
+    artifacts should be versioned.
+
+
+    \item \textbf{Adaptability.}
+    
+    \noindent
+    To distribution shifts and dynamic business requirements. 
+    The system can be updated without service interruption.
+\end{enumerate}
+
+
+
+
+
+% Ameisen, 2020
+\subsection{Framing the ML Editor}
+
+\textbf{How could we iterate through a product use case to find the right ML framing?}
+Since most product goals are very specific, attempting to
+solve an entire use case by learning it from end-to-end often
+requires custom-built cutting-edge ML models. This may be the
+right solution for teams that have the resources to develop and
+maintain such models, but it is often worth it to start with
+more well-understood models first.
+
+It is often a great idea to be the algorithm before they
+implement it. In other words, to understand how to best
+automate a problem, start by attempting to solve it manually.
+So, how would we go about it?
+
+If we start with a human heuristic and then build this simple
+model, we will quickly be able to have an initial baseline,
+and the first step toward a solution. Moreover, the
+initial model will be a great way to inform what to build next.
+
+
+% Ameisen, 2020
+\subsection*{Monica Rogati: How to Choose and Prioritize ML Projects}
+The ideal case is that you can pitch the results regardless of the outcome: if you do
+not get the best outcome, is this still impactful? Have you learned something or validated
+some assumptions? A way to help with this is to build infrastructure to help
+lower the required effort for deployment.
+
+Q: How do you scope out an ML product?
+
+You have to remember that you are trying to use the best tools to
+solve a problem, and only use ML if it makes sense.
+
+
+Q: How do you decide what to focus on in an ML project?
+
+You have to find the impact bottleneck, meaning the piece of your pipeline that
+could provide the most value if you improve on it. When working with companies, I
+often find that they may not be working on the right problem or not be at the right
+growth stage for this.
+
+There are often problems around the model. The best way to find this out is to
+replace the model with something simple and debug the whole pipeline. Frequently,
+the issues will not be with the accuracy of your model. Frequently, your product is
+dead even if your model is successful.
+
+
+Q: Why do you usually recommend starting with a simple model?
+
+The goal of our plan should be to derisk our model somehow. The best way to do
+this is to start with a “strawman baseline” to evaluate worst-case performance.
+
+Looking at your data helps you think of good heuristics, models, and ways to reframe
+the product.
+

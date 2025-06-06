@@ -1,0 +1,391 @@
+\section{Succeeding with AI}
+
+
+
+\subsection{Introduction}
+The successful use of AI requires significant human involvement
+and insight. AI on its own isn't a substitute for business knowledge,
+nor can it improve your business by solely looking at the data and
+making recommendations
+\footnote{
+    \textbf{Warning.}
+
+    The fastest way to fail with AI is for the executive and business
+    leaders to think, "AI can solve our problems; we don't need to do
+    anything except hire the right tech geeks and unleash them on our
+    data," or for the whole data science team to think,
+    "Businesspeople take care of the business; we focus on technology."
+    Business and technology must work together for success.
+}.
+
+To intelligently apply AI, you need special skills and knowledge to
+enable you to combine your business domain with it.
+\footnote{
+    \textbf{Warning.}
+
+    Technical knowledge regarding AI algorithms isn't sufficient to
+    get business results using AI.
+}.
+
+What you need to know to run and get good results from an AI-based
+project. It's assumed that you can run a general technical project.
+
+A team that pays attention to how to link technology with the business
+problem will beat a team that consists of (slightly) better specialists
+in a limited area of technology or business. If you aren't taking a
+genuine interestin what the other side does, this book isn't for you.
+\footnote{
+    \textbf{Warning.}
+
+    If you're a data scientist, this book will be of value to you, as
+    long as you're interested in how to achieve business results with
+    AI. This book expects the reader who has a business background to
+    be willing to learn the basics of how AI works. Similarly, if
+    you're a leadership-focused data scientist, you're expected to be
+    willing to learn about the business side of the equation.
+}.
+
+
+\subsection{AI and the Age of Implementation}
+The ways AI is best used in academia and industry are different.
+
+Successfully applying AI to business problems is not research in
+the traditional academic sense. Unless you're a researcher at a
+university (or in an industry-supported R&D) who's getting paid
+for conducting research itself, additional research results are
+difficult to monetize. You need the best practices for
+implementing AI projects.
+
+Academia focuses on discovering new principles, industry is more
+concerned with implementing existing knowledge. What we're
+doing today is applying known principles of AI to concrete
+business problems. If we're in the Age of Implementation, what
+we need most are practices for the best application of AI to
+new areas of the business and this is the case given the context
+of an AI project in business and industry today
+\footnote{
+    In almost all industry projects, it's dangerous for both
+    your project and your career to depend on the need to make
+    new scientific discoveries to be able to deliver the project.
+}.
+
+
+\subsection{How do you make money with AI?}
+Simply analyzing data with AI is not enough it's essential to
+have a clear plan for how to use the results to drive business
+value. He suggests that this plan should be developed at the
+beginning of the project [and refined if necessary during
+the course of the project], rather than after the analysis is
+complete
+\footnote{
+    The main insight to remember is that using AI to analyze
+    data doesn't make money; properly reacting to the results
+    of the correct analysis does.
+}.
+
+It is important to remember that it is not always about money.
+Not all organizations are interested just in making profit.
+If you're working for a charity or non-governmental nonprofit
+organization (NGO), you have nonmonetary goals, such as the
+number of people you help. If you're a nonprofit devoted to
+helping people, then substitute an appropriate, quantifiable
+metric for the word “money.” How many people did you help? To
+what degree did you help them?
+
+
+\subsection{What matters for your project to succeed?}
+Let us consider the best practices of time and project
+management. Not every technology you'd use on your project
+is equally important for success. Nor is every part of your
+project equally important. Your time should be focused on 
+those parts of your project that matter the most for success.
+
+An AI project's leadership has to make many choices, and it's
+easy to get lost in them. Those choices are in many different
+technical areas—areas like what infrastructure to use, how to
+handle big data, whether to use cloud or on-premise solutions,
+and which AI algorithms to use. Within each one of those
+categories are many additional choices you'd have to make
+\footnote{
+    \begin{itemize}
+        \item Clound, on-premise?
+        \item Do we need to handle big data?
+        \item Which algorithms/models?
+        \item Which metrics for evaluation?
+        \item What monitoring and security infraestrcture do
+        you need?
+    \end{itemize}
+}.
+
+Although you must choose your infrastructure correctly
+(on a do not sink level), the primary determinant of the AI
+project's success lies in how well you connect the answer to
+your research question with a specific business action.
+Once you're confident in that connection, then you can focus
+your attention on infrastructure and making good infrastructural
+choices.
+
+Don't get bogged down in technical details early on.
+When embarking on an AI project, the highest priority for
+management attention must be on linking a research question
+to specific business action.
+
+Infrastructure is an enabler, not the focus
+\footnote{
+    Let's embrace the analogy that data is the new oil. If you
+    need a new oilfield, you'd put your greatest focus into
+    finding oil and understanding what an oilfield looks like.
+    You most certainly wouldn't start by buying the best oil
+    drilling equipment in the world, with the drilling location
+    as an afterthought. The same thing applies to data.
+    concentrate on finding oil, not on the drilling equipment.
+}. Infrastructure is only critical in large enterprises where
+broad data science adoption requires it. As a project leader,
+you must be careful that you don't intermix the enabler with
+the value you're building. Your primary focus should be on
+value. You should never allow yourself to be in the situation
+in which you're discussing infrastructure but have no concrete
+idea of what specific business questions you intend to use AI
+to answer
+\footnote{
+    There is one exception to the "Don't start with the
+    infrastructure” rule. If the enterprise is large, you may
+    need an infrastructure that supports as wide a range as
+    possible of technologies used in AI today. Only the largest
+    companies are in this position, and, for them, my advice is
+    that they build infrastructure in parallel with the
+    definition and development of data science use cases that
+    need to be supported.
+}.
+
+
+\subsection{Machine learning from 10,000 feet}
+Let's got through the roles that humans will need to fill for a
+project using AI to succeed.
+
+Although ML can process data and optimize specific metrics, it
+lacks comprehension of the meaning behind the data
+\footnote{
+    ML is not magical—it's a mathematical tool that operates on
+    numbers to optimize a metric. The only goal an ML algorithm
+    has is to find an optimal value of a given evaluation
+    metric, all the while not knowing or caring about why it's
+    optimizing that particular metric.
+
+    Informally, ML is the application of some mathematical
+    algorithm that requires data input in a certain format,
+    produces an answer in a predefined output format, and
+    doesn't provide any other guarantee except that it will
+    minimize some number that we call the evaluation metric.
+
+    ML certainly is not magical. The trick of using ML is how
+    you use them. The real value comes from how humans apply
+    and interpret the results.
+}.
+
+The use of ML involves three parts
+\footnote{
+    If you're an executive, one way to think about ML is as a
+    black box that operates on numbers. Who then is responsible
+    for bringing intelligence to that ignorant black box?
+    Humans, through the proper formulation (that's the job of
+    data scientists) and application of the appropriate
+    evaluation metric that measures something relevant to your
+    business (that's your job as an executive, in cooperation
+    with the data scientist).
+}: 
+\begin{enumerate}
+    \item Formulation (framing the business problem in terms of
+    input/output data),
+    
+    \item Optimization (how the ML algorithm finds optimal
+    solutions with respect to an evaluation metric), and
+    
+    \item Evaluation (measuring the success of the optimization
+    using relevant metrics).
+\end{enumerate}
+It's up to you as the user of the algorithm to understand which
+evaluation metric is best and what the best format is for your
+data.
+
+If you're a data scientist, you're aware of what ML is. But
+here's a detail that's easy to miss: because the only guarantee
+provided by the algorithm is that it will optimize the
+evaluation metrics, those metrics must have a business meaning
+\footnote{
+    Those metrics can't just be something you've seen in an
+    academic paper, and certainly not something you don't know
+    how to relate to anything concrete in your business.
+
+    When a data science team is choosing the evaluation metrics,
+    they must do so in close cooperation with the executive
+    team. Here's the scary thing—a lot of ML projects
+    use evaluation metrics that aren't clearly tied to business
+    results.
+}.
+
+At best, most of the technical evaluation metrics are merely
+correlated with but not identical to the business result you're
+trying to get. At worst, those evaluation metrics that your data
+scientist can't even explain in business terms are in the will
+not help your business category
+\footnote{
+    If you're an executive, a good habit for you to form is to
+    speak up when you see an acronym in a business presentation
+    that you don't know (for example, RMSE). Similarly, with ML,
+    demand an explanation in the form of, “Don't tell me the
+    mathematical definition of that metric; tell me how to
+    relate the value of that metric to something in my business.”
+}.
+
+If your evaluation metric isn't tied to your business result,
+you're using a black box (the ML algorithm) to generate a random
+number (a value of the evaluation metric) and then trying to
+figure out how to run your business based on that random number.
+Good luck!
+
+
+\subsection{Start by understanding the possible business actions}
+Focused human involvement and attention makes or breaks an AI
+project.
+
+You don't make money simply by knowing the answer to a business
+question—you make money when you take action. The number of good,
+effective actions you can take to affect the physical world is
+relatively small. Many analyses you can perform will yield
+results that are not actionable.
+
+Don't ask a question if you can't imagine what you'd do with the
+answer. You should start an AI project by asking, "What actions
+can I take, and what analysis do I need to do to inform those
+actions?"
+
+Once you know the business actions you can take, you should use
+these actions to drive the analysis, not vice versa.
+
+In every AI project, these are the two most important ideas to
+remember:
+\begin{enumerate}
+    \item Action is where you make profit; analysis without action
+    is just cost. You make money when you perform an appropriate
+    business action, not when some analysis is completed
+    \footnote{
+        Analysis can be an enabler of making profits, but from an
+        accounting perspective, analysis is a cost. Analysis stops
+        being a cost and becomes an investment only when it can
+        help you take good business actions.
+    }.
+
+    \item Focus on the whole system, not on its individual parts.
+    Your customers will never see the individual parts of the
+    system.
+\end{enumerate}
+[Not all projects are profits based, some are also 
+risk-minimization or regulatory-requirements based.]
+
+
+\subsection{Don't fish for "something in the data"}
+Teams that fail to start a project by focusing on which business
+actions they can take will routinely encounter two failure modes:
+\begin{itemize}
+    \item copying something that “worked for another organization”.
+    
+    Copying parts of a system that worked for someone else doesn't
+    work, because that copying then confines you to the decisions
+    someone else made for their context, whereas your project
+    should deliver a whole system customized to solve your
+    business problem.
+    
+    \item use AI to look for “something in the data”.
+    What's the chance that you'd actually be able to execute on
+    some random action that the analysis just divined? How much
+    money do you want to spend on the off chance of getting an
+    idea unrelated to your day-to-day business operations?
+    \footnote{
+        Sometimes you can execute on an unexpected insight. Your
+        success average will be higher if the studies you perform
+        are related to areas of your business where you can take
+        action based on the possible results of your study.
+    }
+\end{itemize}
+Neither of those approaches works well in practice.
+
+
+\subsection{AI finds correlations, not causes!}
+AI as practiced in business and industry today finds correlations,
+not causes
+\footnote{
+    This is important to recognize because newcomers to AI, after
+    seeing AI answer a complicated question, sometimes
+    anthropomorphize AI and attribute to it the ability to know
+    the reason behind the answer when it's often just guessing.
+}.
+AI might predict an event, but few AI algorithms would impute any
+cause: they don't say why it is, just that it is.
+
+When you're thinking about what you need AI to do for your
+business, keep in mind the differences between the human use of
+causal models and how AIs work:
+\begin{itemize}
+    \item AI models find patterns, but it does not find causes
+    automatically.
+
+    \item If an explanation why an AI algorithm made some decision,
+    carefully considerion must be paid to how to translate the
+    algorithm's behavior in a way that you and your audience can
+    understand.
+
+    \item Most AI algorithms used today, especially in the big
+    data domain, have a limited ability to guide change.
+    That ability is limited to situations in which you have
+    data for both where you are now and where you want to go.
+\end{itemize}
+
+Always tread carefully when you think about using AI to impute
+causes or to guide change. There are significant limits to what is
+known even in academic settings about inferring causality in
+complex scenarios.
+
+
+\subsection{Business results must be measurable!}
+For an AI project to succeed, you need to be able to measure the
+results of the data science project in the context of its business
+impact. That measurement needs to be quantifiable
+\footnote{
+    AI and ML algorithms can't use gut feeling metrics as
+    feedback on how well the project is doing, so someone needs
+    to define a quantitative metric.
+}.
+Before you can measure how your data scientists would impact your
+business, you need to be able to measure your business as it is
+today.
+
+Once you have those business metrics, you should have a way to
+tie those metrics to the technical evaluation metric that the ML
+algorithm uses. Depending on the methodology you're using to run
+your business, business metrics could be readily available, or
+you might have to develop them yourself
+\footnote{
+    You may not have a direct business metric at your department
+    level to which you can direct your data science project. If
+    that's the case and you don't already have a metric to use,
+    define one yourself.
+}.
+
+The complexity associated with recognizing and defining good
+business metrics is exactly why I recommend that you develop a
+thorough understanding of the operations of your business
+\footnote{
+    A good business metric yields a number that's directly related
+    to some business result. Such a metric is actionable. In the
+    case of a recommendation engine, a good business metric could
+    be expected increase in profit. Any technical metric that has
+    no clear meaning in the context of business is obviously not
+    a good business metric. In the absence of quantitative
+    business metrics, you're running a project based on gut
+    feeling.
+}.
+
+
+\subsection{What is CLUE?}
+

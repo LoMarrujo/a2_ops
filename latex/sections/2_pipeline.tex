@@ -1,0 +1,81 @@
+\section{End-to-End Pipeline}
+\noindent
+This first iteration will be lackluster by design. Its goal is to
+allow us to have all the pieces of a pipeline in place so that we
+can prioritize which ones to improve next. Having a full prototype
+is the easiest way to identify the impact bottleneck.
+
+
+\subsection{The Simplest Scaffolding}
+For the first prototype of an application, we will focus on being
+able to deliver results to users. This means that we will start
+with the inference pipeline.
+
+Building, validating, and updating hypotheses about the best way to
+model data are core parts of the iterative model building process,
+which starts before we even build our first model!
+
+The vast majority of ML projects should start with a heuristic
+based on expert knowledge and data exploration and to use it
+to confirm initial assumptions and speed up iteration.
+
+Once you have a heuristic, it is time to create a pipeline that can
+gather input, preprocess it, apply your rules to it, and serve
+results.
+
+The point here is to do for your product the same thing we did for
+your ML approach, simplify it as much as possible, and build it so
+you have a simple functional version. This is often referred to as
+an MVP (minimum viable product) and is a battle-tested method for
+getting useful results as fast as possible.
+
+
+
+\subsection{Protoype}
+
+\begin{enumerate}
+    \item Parse and Clean Data
+    \item Tokenizing Text
+    \item Generating Features
+\end{enumerate}
+
+
+
+\subsection{Test Your Workflow}
+We can test our assumptions about the way we've framed our problem
+and how useful our proposed solution is. Take a look both at the
+objective quality of our initial rules and examine whether we
+are presenting our output in a useful manner.
+
+
+\subsection*{User Experience}
+Let's first examine how satisfying our product is to use,
+independently of the quality of our model. In other words, if we
+imagine that we will eventually get a model that performs well
+enough, is this the most useful way to present results to our users?
+
+In other words, we would want to make sure that the results we
+present are useful (or will be if we improve our model). On the
+flip side, of course, we'd also like our model to perform well.
+That is the next aspect we'll evaluate.
+
+
+
+\subsection*{Modeling Results}
+Having a working prototype early on will allow us to identify and
+iterate on our chosen metrics to make sure they represent product
+success.
+
+The goal of considering both user experience and model performance
+is to make sure we are working on the most impactful aspect. If
+your user experience is poor, improving your model is not helpful.
+In fact, you may realize you would be better served with an entirely
+different model!
+
+The goal of looking both at modeling results and at the current
+presentation of the product is to identify which challenge to
+tackle next. Most of the time, this will mean iterating on the
+way we present results to our users (which could mean changing the
+way we train our models) or improving model performance by
+identifying key failure points.
+

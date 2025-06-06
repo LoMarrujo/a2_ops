@@ -1,0 +1,357 @@
+% Ameisen
+\section{Getting Data}
+Data is needed to validate the candidate workflow and model.
+
+
+
+% Ameisen
+\subsection{Iterate on Datasets}
+The fastest way to build an ML product is to rapidly build,
+evaluate, and iterate on models
+\footnote{
+    Datasets themselves are a core part of that success of models.
+    This is why data gathering, preparation, and labeling should
+    be seen as an iterative process, just like modeling. Start
+    with a simple dataset that you can gather immediately, and
+    be open to improving it based on what you learn.
+}.
+
+ML engineering combines engineering and ML in order to build
+products. Our dataset is thus just another tool to allow us
+to build products. In ML engineering, choosing an initial dataset,
+regularly updating it, and augmenting it is often the majority of
+the work
+\footnote{
+    Datasets are fixed in research, but part of the product in
+    industry.
+}.
+
+
+% Ameisen
+\subsection*{Do Data Science}
+I've seen the process of curating a dataset be the main roadblock
+to building ML products more times than I can count.
+It is easy to think of working with data as a chore to tackle
+before playing with fun models, but models learn from the data
+\footnote{
+    Most practitioners overestimate the impact of working on the
+    model and underestimate the value of working on the data, so
+    I recommend always making an effort to correct this trend and
+    bias yourself toward looking at data.
+}.
+
+
+
+% Ameisen
+\subsection{Explore Your First Dataset: Be Efficient, Start Small}
+For most ML problems, more data can lead to a better model, but
+this does not mean that you should start with the largest possible
+dataset. If you are working at a company with terabytes of data
+stored in a cluster, you can start by extracting a sample that
+your local machine can handle.
+
+
+% Huyen Sampling
+\subsection*{Sampling}
+Understanding different sampling methods and how they are being
+used in our workflow can, first, help us avoid potential sampling
+biases, and second, help us choose the methods that improve the
+efficiency of the data we sample.
+
+
+
+\begin{itemize}
+    \item \textbf{Nonprobability Sampling}
+    
+    \noindent
+
+
+
+
+    \item \textbf{Simple Random Sampling}
+    
+    \noindent
+
+
+
+
+    \item \textbf{Weighted Sampling}
+    
+    \noindent
+
+
+
+
+
+    \item \textbf{Weighted Sampling}
+    
+    \noindent
+
+
+
+
+    \item \textbf{Weighted Sampling}
+    
+    \noindent
+
+
+
+    \item \textbf{Reservoir Sampling}
+    
+    \noindent
+
+
+
+    \item \textbf{Importance Sampling}
+    
+    \noindent
+
+
+
+
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% Ameisen
+\subsection*{Insights Versus Products}
+The distinction between data exploration for analysis purposes
+and data exploration for product building purposes. While both
+aim to extract and understand trends in data, the former concerns
+itself with creating insights from trends, while the latter is
+about using trends to build features.
+
+Before noticing predictive trends, we should start by examining
+quality.
+
+
+
+
+% Ameisen
+\subsection{A Data Quality Rubric}
+Each dataset comes with its own requirements, biases and oddities,
+writing a comprehensive rubric covering anything you may
+want to look for in a dataset is beyond the scope of these notes.
+But, there are a few categories that are valuable to pay attention
+to when first approaching a dataset:
+\begin{itemize}
+    \item \textbf{Data Format.}
+    
+    \noindent
+    Is the dataset already formatted in such a way that you have
+    clear inputs and outputs, or does it require additional
+    preprocessing and labeling?
+
+    How many preprocessing steps does your data require?
+
+    Will you be able to preprocess it in the same way in production?
+
+
+    \item \textbf{Data Quality.}
+    
+    \noindent
+    There are many ways in which data can be of poor quality
+    \footnote{
+        The quality is dependent on the purpose and domain
+        of the ML system.
+    }.
+    It can be due to:
+    \begin{itemize}
+        \item Missing or inaccurate values.
+    
+        \item Poor spelling, many special or incomprehensible
+        characters.
+        
+        \item Poor image resolution, misalignments.
+    \end{itemize}
+    In general, which proportion of your data seems noisy or
+    incorrect?
+
+    We can work with missing labels by either labeling an initial
+    dataset ourselves or finding a weak label we can use, but we
+    can do so only if we notice the quality issues ahead of time.
+
+
+    \item \textbf{Data Quantity and Distribution.}
+    
+    \noindent
+    Estimate whether we have enough data and whether feature
+    values seem within a reasonable range.
+    Check for class imbalance.
+
+    If a dataset is too small for a model to learn from, focus
+    most of the effort on a data generation strategy.
+
+
+\end{itemize}
+If you are given a dataset that has already been processed or
+aggregated for you, you should validate that you understand
+the way in which the data was processed.
+
+
+
+% Ameisen
+\subsection{Label to Find Data Trends}
+To develop an intuition for your data, you should spend some time
+looking at individual data points. However, going through points
+in a dataset at random is quite inefficient. We will use
+clustering as a way to generate some structure to guide our
+exploration.
+
+Examining each cluster individually and the similarities
+and differences between clusters is a great way to identify
+structure in a dataset.
+
+Once you've looked at aggregate metrics and cluster information,
+I'd encourage you to do your model's job by labeling a few data
+points in each cluster with the results you would like a model to
+produce.
+
+Once you've identified some trends, it is time to use them. Most
+often, you can do this in one of two ways, by creating a feature
+that characterizes that trend or by using a model that will easily
+leverage it.
+
+
+
+\subsection{Let Data Inform Features and Models}
+There is a relationship between the way the data is represented
+and the ease with which a model identifies patterns.
+It is often valuable to start by generating features, however;
+first because we will usually be starting with a small dataset and
+second because it helps encode our beliefs about the data and debug
+our models.
+
+Some useful tricks are:
+\begin{itemize}
+    \item \textbf{Time representations.}
+    
+    \noindent
+    Think about if the time variable is relevant to your problem
+    and what patterns do are required as features
+    \footnote{
+        e.g. a trend, seasonality/cyclical, interactions,
+        weekends, weekdays, etc.
+    }.
+    Feature generation is a wide field, and methods exist for most
+    types of data. In general, the best way to generate useful
+    features is by looking at your data using the methods we
+    described and asking yourself what the easiest way is to
+    represent it in a way that will make your model learn its
+    patterns.
+\end{itemize}
+
+
+
+
+
+
+
+
+% Huyen
+\subsection{Labeling}
+
+
+
+
+
+
+
+
+
+
+
+% Huyen
+\subsection{Class Imbalance}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% Huyen
+\subsection{Data Agumentation}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

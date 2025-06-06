@@ -1,0 +1,516 @@
+\section{Development Guidelines}
+Here we cover some guidelines that are useful for the research and
+development of machine learning projects. We assume project 
+feasibility and a solid understanding of the project requirements.
+
+
+\subsection{DevOps}
+% Practical MLOps
+DevOps is a set of technical and management practices that aim to increase an organization’s
+velocity in releasing high-quality software. Some of the benefits of DevOps
+include speed, reliability, scale, and security. These benefits occur through adherence
+to the following best practices:
+\begin{itemize}
+    \item \textbf{Continuous Integration (CI)}:
+    
+    \noindent 
+    CI is the process of continuously testing a software project and improving the
+    quality based on these tests' results
+    \footnote{
+        It is automated testing using open source and SaaS build
+        servers such as GitHub Actions, Jenkins, Gitlab, CircleCI,
+        or cloud native build systems like AWS Code Build.
+    }
+
+
+    \item \textbf{Continuous Delivery (CD)}:
+    
+    \noindent 
+    This method delivers code to a new environment without human
+    intervention
+    \footnote{
+        CD is the process of deploying code automatically, often
+        through the use of IaC.
+    }.
+    
+
+    \item \textbf{Microservices}
+
+    \noindent
+    A microservice is a software service with a distinct function
+    that had little to no dependencies.
+
+    One of the most popular Python-based microservice frameworks is
+    Flask
+    \footnote{
+        For example, a machine learning prediction endpoint is
+        an excellent fitfor a microservice.
+    }.
+
+
+    \item \textbf{Infrastructure as Code}
+    
+    \noindent
+    Infrastructure as Code (IaC) is the process of checking the
+    infrastructure into a source code repository and “deploying”
+    it to push changes to that repository. IaC allows for
+    idempotent behavior and ensures the infrastructure doesn't
+    require humans to build it out.
+
+
+    \item \textbf{Monitoring and Instrumentation}
+    
+    \noindent
+    Monitoring and instrumentation are the processes and techniques
+    used that allow an organization to make decisions about a
+    software system's performance and reliability
+    \footnote{
+        Through logging and other tools like application
+        performance monitoring tools such as New Relic,
+        Data Dog, or Stackdriver, monitoring and instrumentation
+        are essentially collecting data about the behavior of an
+        application in production or data  cience for deployed
+        software systems This process is where Kaizen comes into
+        play; the data-driven organization uses this
+        instrumentation to make things better daily or weekly.
+    }.
+    
+
+    \item \textbf{Effective Technical Communication}
+    
+    \noindent
+    This skill involves the ability to create effective,
+    repeatable, and efficient communication methods
+    \footnote{
+        An excellent example of effective technical communication
+        could be adopting AutoML for the initial prototyping of a
+        system. Of course, ultimately, the AutoML model may be
+        kept or discarded. Nevertheless, automation can serve as an
+        informational tool to prevent work on an intractable
+        problem.
+    }.
+    
+
+    \item \textbf{Effective Technical Communication}
+    
+    \noindent
+    This process can efficiently use human and technology
+    solutions, like ticket systems and spreadsheets,
+    to manage projects.
+
+    Also, appropriate technical project management requires
+    breaking down problems into small, discreet chunks of
+    work, so incremental progress occurs
+    \footnote{
+        An antipattern in machine learning is often when a
+        team works on one production machine model that
+        solves a problem "perfectly". Instead, smaller wins
+        delivered daily or weekly is a more scalable and
+        prudent approach to model building.
+    }.
+    
+\end{itemize}
+CI/CD are two of the most critical pillars of DevOps. All MLOps
+team members should help develop and maintain the CI/CD system.
+A wellmaintained CI/CD system is a form of investment in the
+future of the team and company.
+
+
+
+
+\subsection{Code Structure and Organization}
+The recommendations are:
+\begin{itemize}
+    \item \textbf{Modular Design}:
+    
+    \noindent 
+    Break down code into reusable, well-encapsulated modules or
+    functions
+    \footnote{
+        Keep model definitions, data processing, feature
+        engineering, and training scripts separate.
+    }.
+
+
+    \item \textbf{Single Responsability}:
+    
+    \noindent
+    Each class, module, or function should have responsibility over
+    a single part of the functionality
+    \footnote{
+        e.g. refactor a function train\_test into train and test
+        separate functions.
+    }.
+
+
+    \item \textbf{Clear Naming Conventions}:
+    
+    \noindent   
+    Use meaningful variable and function names that clearly
+    indicate their purpose
+    \footnote{
+        e.g. train\_model, preprocess\_data, etc.
+    }.
+
+
+    \item \textbf{Don't Repeat Yourself (DRY)}:
+    
+    \noindent
+    Replace code repetitions (which will likely change!) with
+    code abstractions. The The DRY principle is stated as "Every
+    piece of knowledge must have a single, unambiguous,
+    authoritative representation within a system".
+
+    When the DRY principle is applied successfully, a modification
+    of any single element of a system does not require a change
+    in other logically unrelated elements. 
+
+
+    \item \textbf{Version Control}:
+    
+    \noindent 
+    Use git for version control. Also, decide on the best git
+    workflow for the team and project.
+
+    Some general recommendations are:
+    \begin{itemize}
+        \item Make small and incremental changes.
+        
+        \item Keep commits atomic, that is, commits should be based
+        on single unit of work involving one single task.
+
+        \item Develop using branches to separate the main code 
+        (which is stable and tested) from developments. There are
+        different branching strategies (e.g. centralized workflow,
+        feature based, personal based, gitflow based).
+
+        \item Write descriptive commit messages. The purpose of
+        each commit should be explained. Also, it is a good idea
+        to standarize a template for enforcing descriptive commits
+        \footnote{
+            e.g. [ticket id] <type> (scope) <description>,
+
+            where the ticket id is optional and related to a Jira
+            ticket; the type can be one of:
+            \begin{itemize}
+                \item feat (new features)
+                \item fix (bug fixes)
+                \item refactor (rewritting or reestrcturing
+                code with no changes in code functionality)
+                \item perf (performance improvements)
+                \item style (changes in code formatting/syntax)
+                \item test (new or corrected tests)
+                \item docs (documentation)
+                \item build (build components like pipelines, models
+                dependencies)
+                \item ops (operational components like
+                infrastructure, deployment, backups)
+                \item chore (miscelaneous tasks);
+            \end{itemize}
+            the scope should be a descriptive noun; and the 
+            description should be as concise and meaningful.
+        }.
+    \end{itemize}
+
+    Also, during the git workflow there should be \textbf{code
+    reviews} and \textbf{style consistency}.
+
+
+
+    \item \textbf{Pipeline Orchestration}:
+    
+    \noindent 
+    Use tools like Luigi, Airflow, or Snakemake to automate and
+    manage complex ML pipelines.
+
+
+
+    \item \textbf{Reproducibility.}
+    
+    \noindent
+    Maintain isolated environments, user random seed setting and
+    if using notebooks, clean and organize cells, and ensure that
+    the notebook runs without errors.
+
+
+    
+    \item \textbf{Remember the Zen of Python.}
+    
+    Beautiful is better than ugly.
+
+    Explicit is better than implicit. 
+
+    Simple is better than complex.
+
+    Complex is better than complicated.
+
+    Flat is better than nested.
+
+    Sparse is better than dense.
+
+    Readability counts.
+
+    Special cases aren't special enough to break the rules.
+    
+    Although practicality beats purity.
+
+    Errors should never pass silently.
+
+    Unless explicitly silenced.
+
+    In the face of ambiguity, refuse the temptation to guess.
+    There should be one-- and preferably only one --obvious way to do it.
+    Although that way may not be obvious at first unless you're Dutch.
+    Now is better than never.
+    Although never is often better than *right* now.
+    
+    If the implementation is hard to explain, it's a bad idea.
+    
+    If the implementation is easy to explain, it may be a good idea.
+    
+    amespaces are one honking great idea -- let's do more of those!
+ 
+    
+
+    \item \textbf{Evidence-based design (EBD).}
+    
+    \noindent
+    Evidence-based design (EBD) is the process of constructing a
+    building or physical environment based on scientific research
+    to achieve the best possible outcomes. Software is developed
+    based on customer inputs, standard libraries in the industry
+    or credible research.
+
+
+
+    \item \textbf{You are not going to need it (YAGNI).}
+    
+    \noindent
+    You aren't going to need it (YAGNI) principle states that we
+    should only implement functionalities when we need them and
+    not when we foresee we might need them.
+
+
+
+    \item \textbf{Minimum Viable Product (MVP).}
+    
+    \noindent
+    We work through Minimum Viable Products (MVP), which are our
+    milestones. An MVP is that version of a new product which
+    allows a team to collect the maximum amount of validated
+    learning about customers with the least effort
+    \footnote{
+        More information about MVPs can be found in the Lean
+        Startup methodology.
+    }.
+    
+
+
+    \item \textbf{Publish Often Publish Early.}
+    
+    \noindent
+    Even before we have an MVP, get the code base working and
+    doing something, even if it is something trivial that everyone
+    can "run" easily.
+
+
+
+    \item \textbf{If it is going to fail, let it fail fast.}
+    
+    \noindent
+    Make sure that our code has sanity checks for all input
+    parameters checking the validity of data to match the
+    functional bounds to ensure that if the code is going to fail,
+    then it fails as soon as possible.
+
+\end{itemize}
+
+
+
+% Designing ML Systems
+\subsection{}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Documentation}
+
+\begin{itemize}
+    \item \textbf{Business Understanding File}:
+    
+    \noindent
+    A text based file for documenting the objective, scope,
+    timeline, requirements, data exploration results,
+    encountered issues and their solution. This help us to maintain 
+    alignment with the business objective.
+
+
+    \item \textbf{Data inputs.}
+    
+    \noindent
+    Find a way to document the required data inputs (includes their
+    extraction, transformations, and anything relevant) to feed
+    into the ML model for training.
+
+
+    \item \textbf{Code Comments.}
+        
+    \noindent
+    Write concise comments that explain why something is done
+    rather than what is done. Avoid over-commenting.
+
+
+    \item \textbf{Docstrings.}
+       
+    \noindent
+    Include docstrings in all functions, classes, and modules to 
+    describe their functionality, parameters, and return values.
+    Use a standard format.
+
+
+    \item \textbf{Readme and Usage Instructions.}
+        
+    \noindent
+    Provide a clear README file with instructions on how to set up
+    the environment, run the code, and understand the project's
+    structure.
+
+
+    \item \textbf{Experiment Tracking.}
+        
+    \noindent
+    Document experiments, including hyperparameters, models, and
+    results
+    \footnote{
+        e.g. MLFlow, Weights \& Biases.
+    }
+\end{itemize}
+
+
+
+\subsection{Testing}
+% recommenders
+We use Test Driven Development (TDD) in our development.
+Testing is essential for code quality.
+Tests need to be automated and regularly run to benefit from them.
+All important code should have unit tests, we use pytest for
+Python files and papermill for notebooks.
+Frameworks such as pytest are based on many years of exercise and
+help you apply best practices to your tests.
+
+%.
+\begin{itemize}
+    \item \textbf{Unit Tests.}
+    
+    \noindent
+    Write unit tests for all critical functions, especially those
+    involving data preprocessing, feature engineering, and model
+    evaluation.
+
+
+    \item \textbf{Integration Tests.}
+    
+    \noindent
+    Test the interaction between different modules and components
+    to ensure they work together correctly.
+
+    % recommenders
+    Apart from unit tests, we also have nightly builds with smoke
+    and integration tests.
+    % https://miguelgfierro.com/blog/2018/a-beginners-guide-to-python-testing/
+
+    \item \textbf{Test Data.}
+    
+    \noindent
+    Use representative test data to validate the logic of your code.
+    Ensure that the test data covers edge cases. 
+
+
+    \item \textbf{Automated Testing.}
+    
+    \noindent
+    Integrate automated testing into your CI/CD pipeline to ensure
+    that all tests are run whenever code is pushed or merged.
+
+\end{itemize}
+
+
+
+\subsection{Performance and Efficiency}
+
+\begin{itemize}
+    \item \textbf{Efficient Data Handling.}
+    
+    \noindent
+    Use efficient data structures and libraries like numpy, pandas,
+    or dask
+    \footnote{
+        Avoid unnecessary data copies. Think of the logic of the
+        operations. Evaluate performance.
+    }.
+
+
+    \item \textbf{Use Parallel Computing.}
+    
+    \noindent
+    Use parallel processing or distributed computing where
+    applicable, especially for tasks like hyperparameter tuning
+    or model training
+    \footnote{
+        use dask, ray or spark
+    }.
+
+
+    \item \textbf{Memory Management.}
+    
+    \noindent
+    Monitor and optimize memory usage, particularly when working
+    with large datasets or deep learning models.
+
+
+    \item \textbf{Profiling and Optimization.}
+    
+    \noindent
+    Profile code to identify bottlenecks. Use tools like cProfile,
+    line\_profiler, or memory profilers to optimize performance.
+
+
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+\subsection{Model Deployment and Monitoring}
+
+
+
+
+
+
+
+
+
+
+\subsection{Continuous Learning}
+
+
+
+
+
+
