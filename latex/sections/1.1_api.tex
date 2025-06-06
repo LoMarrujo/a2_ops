@@ -1,0 +1,145 @@
+\section{APIs}
+
+As ..., 
+Understanding Application Programming Interfaces (APIs) is crucial
+for integrating machine learning models, automating workflows, and
+accessing data from external sources.
+
+Here's everything you need to know:
+\begin{itemize}
+    \item \textbf{What is an API?}
+
+    \noinent
+    An API is a set of rules that allows applications and computers
+    to communicate with each other
+    \footnote{
+        For example, consider building a stock's prirce prediction
+        model based on past prices, you'll at least need a way to
+        get the data and some kind of output and if another process
+        consumes the output of the model to present it in a user's 
+        interface.
+        
+        It's a good idea to have a document or standard that described
+        how to build such a connection or interface. A computer system
+        that meets this standard is said to \textbf{implement} or 
+        \textbf{expose} an API.
+    }.
+    It abstracts complex operations and provides a simple interface
+    to interact with a system.
+
+
+
+    \item \textbf{Types of APIs}
+
+    \noindent
+    The most common APIs for ML are:
+    \begin{itemize}
+        \item \textbf{RESTful} (a.k.a. REST) API is an interface that
+        two computer systems use to exchange information securely over
+        the internet.
+        
+        Representational State Transfer (REST) is a software architecture
+        that imposes conditions on how an API should work. REST was
+        initially created as a guideline to manage communication on a
+        complex network like the internet. 
+
+        RESTful APIs support this information exchange because they
+        follow secure, reliable, and efficient software communication
+        standards.
+
+        The most important concepts are:
+        \begin{itemize}
+            \item \textbf{Endpoint}: URLs where API services are accesed.
+            
+            \item \textbf{HTTP methods}:
+            \begin{itemize}
+                \item \textbf{get}: retrieves data.
+                \item \textbf{post}: sends data.
+                \item \textbf{put}: update data.
+                \item \textbf{delete}: remove data.
+            \end{itemize}
+            
+            \item \textbf{Request Headers}: Metadata like authentication
+            tokens.
+
+            \item \textbf{Request Body}: json payload sent in POST/PUT requests.            
+
+            \item \textbf{HResponse Codes:}:
+            \begin{itemize}
+                \item \textbf{200 OK}: success.
+                \item \textbf{400 BAD REQUEST}: client error.
+                \item \textbf{401 Unauthorized}: authentication required.
+                \item \textbf{500 Internal Server Erro}: API-side issue.
+            \end{itemize}
+        \end{itemize}
+
+        \item GraphQL.
+        
+
+        \item SOAP.
+
+
+        \item gRPC APIs.
+        
+
+        \item WebSocket.
+
+    \end{itemize}
+
+
+    \item \textbf{Authentication and Security}
+
+    \noindent
+    APIs often expose sensitive data and functionality, making security
+    a critical aspect. Without proper authentication, your API could be
+    exploited, leading to data breaches or unauthorized access.
+    Understanding authentication methods ensures your API remains secure
+    while maintaining usability.
+
+    Some of the most common authentication methods are:
+    \begin{itemize}
+        \item \textbf{API Keys}: Basic token-based access.
+        \item \textbf{OAuth 2.0}: Secure, used for user authentication
+        (e.g., Google, AWS).
+        \item \textbf{JSON Web Token (JWT)}: Token-based authentication
+        with encryption.
+    \end{itemize}
+    When developing APIs, keep these best practices for security in 
+    mind:
+    \begin{itemize}
+        \item Never expose API keys in public code.
+        \item Use environment variables for storing credentials.
+        \item Implement rate limiting to avoid abuse.
+        \item se HTTPS to encrypt communication.
+    \end{itemize}
+
+    \item \textbf{API Monitoring & Logging}.
+    \begin{itemize}
+        \item Use loguru or logging to track API requests.
+        \item Tools like Prometheus + Grafana for performance tracking.
+    \end{itemize}
+
+    \item \textbf{Synchronous and Asynchronous Requests}.
+
+    A synchronous request blocks the client until operation completes.
+    In such case, javascript engine of the browser is blocked. On the
+    other hand, an asynchronous request doesn't block the client i.e.
+    browser is responsive. At that time, user can perform another
+    operations also. In such case, javascript engine of the browser
+    is not blocked.
+\end{itemize}
+
+
+
+\subsection{Working with APIs in Data Science.}
+The most  common use  cases of APIs for Data Science are:
+\begin{enumerate}
+    \item Fetching data
+    (e.g. Twitter's API, Yahoo Finance, Geolocation APIs).
+    \item Deploying Machine Learning Models via APIs
+    (e.g. FastAPI, Flask, AWS Lambda, Google Cloud Functions).
+    \item Automating Workflows
+    (e.g. Airflow, Prefect, or Dagster).
+    \item Data Streaming
+    (e.g. WebSockets or Kafka for real-time data).
+\end{enumerate}

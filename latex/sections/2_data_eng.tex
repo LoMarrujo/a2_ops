@@ -1,0 +1,192 @@
+\section{Data Engineering}
+
+
+\subsection{What's Data Engineering?}
+\noindent
+% Fundamentals of DataEng
+Data engineering is
+\footnote{
+    Data engineering can also be viewed as the intersection of
+    security, data management, DataOps, data architecture
+    orchestration, and software engineering.
+}
+the design, development, and maintenance of systems that
+take in raw data and produce quality information that
+supports downstream use cases, such as analysis and
+machine learning.
+
+A data engineer manages the data engineering lifecycle
+\footnote{
+    The data engineering lifecycle shifts toward
+    the data itself and the end goals that it must serve.
+    The stages of the data engineering lifecycle are as follows:
+    \begin{itemize}
+        \item Generation.
+        \item Storage.
+        \item Ingestion.
+        \item Transformation.
+        \item Serving.
+    \end{itemize}
+}, 
+beginning with getting data from source systems and ending
+with serving data for use cases, such as analysis or machine
+learning.
+
+
+
+\subsection*{Data Maturity and the Data Engineer}
+The level of data engineering complexity within a company depends
+a great deal on the company's data maturity. This significantly
+impacts a data engineer's day-to-day job responsibilities and
+career progression. What is data maturity, exactly?
+
+\textbf{Data maturity} is the progression toward higher data
+utilization, capabilities, and integration across the organization,
+but data maturity does not simply depend on the age or revenue of
+a company. An early-stage startup can have greater data maturity
+than a 100-year-old company with annual revenues in the billions.
+What matters is the way data is leveraged as a competitive
+advantage.
+
+Data maturity models have many versions, such as Data Management
+Maturity (DMM) and others. A simple data maturity model has three
+stages:
+\begin{enumerate}
+    \item \textbf{Starting with data.}
+    
+    \noindent
+    A company getting started with data is, by definition, in the
+    very early stages of  its data maturity. The company may have
+    fuzzy, loosely defined goals or no goals.
+
+    Data architecture and infrastructure are in the very early
+    stages of planning and development. Adoption and utilization
+    are likely low or nonexistent. The data team is small, often
+    with a headcount in the single digits.
+
+    A data engineer should focus on the following in organizations
+    getting started with data
+    \footnote{
+        This is a delicate stage with lots of pitfalls.
+        Here are some tips for this stage:
+        \begin{itemize}
+            \item Organizational willpower may wane if a lot of
+            visible successes don't occur with data. Getting quick
+            wins will establish the importance of data within the
+            organization. Just keep in mind that quick wins will
+            likely create technical debt. Have a plan to reduce
+            this debt, as it will otherwise add friction for future
+            delivery.
+            \item Get out and talk to people, and avoid working in
+            silos. We often see the data team working in a bubble,
+            not communicating with people outside their departments
+            and getting perspectives and feedback from business
+            stakeholders.
+            \item Avoid undifferentiated heavy lifting. Don't box
+            yourself in with unnecessary technical complexity.
+            Use off-the-shelf, turnkey solutions wherever possible.
+            \item Build custom solutions and code only where this
+            creates a competitive advantage.
+        \end{itemize}
+    }:
+    \begin{itemize}
+        \item Get buy-in from key stakeholders, including executive
+        management.
+        \item Define the right data architecture (usually solo,
+        since a data architect likely isn't available). This means
+        determining business goals and the competitive advantage
+        you're aiming to achieve with your data initiative. Work
+        toward a data architecture that supports these goals.
+        \item Identify and audit data that will support key
+        initiatives and operate within the data architecture you
+        designed.
+        \item Build a solid data foundation for future data analysts
+        and data scientists to generate reports and models that
+        provide competitive value.
+    \end{itemize}
+
+    
+    \item \textbf{Scaling with data.}
+    
+    \noindent
+    The company has moved away from ad hoc data requests
+    and has formal data practices. Now the challenge is creating
+    scalable data architectures and planning for a future where the
+    company is genuinely data-driven. Data engineering roles move from
+    generalists to specialists, with people focusing on particular
+    aspects of the data engineering lifecycle.
+
+    A data engineer's goals are
+    \footnote{
+        Issues to watch out for include the following:
+        \begin{itemize}
+            \item As we grow more sophisticated with data, there's a
+            temptation to adopt bleeding-edge technologies based on
+            trends. This is rarely a good use of your time and energy.
+            Any technology decisions should be driven by the value
+            they'll deliver to your customers.
+            \item The main bottleneck for scaling is not cluster nodes,
+            storage, or technology but the data engineering team.
+            Focus on solutions that are simple to deploy and
+            manage to expand your team's throughput.
+            \item You'll be tempted to frame yourself as a technologist,
+            a data genius who can deliver magical products. Shift your
+            focus instead to pragmatic leadership and begin transitioning
+            to the next maturity stage; communicate with other teams
+            about the practical utility of data. Teach the organization
+            how to consume and leverage data.
+        \end{itemize}
+    }:
+    
+    \begin{itemize}
+        \item Establish formal data practices.
+        \item Create scalable and robust data architectures.
+        \item Adopt DevOps and DataOps practices.
+        \item Build systems that support ML.
+        \item Continue to avoid undifferentiated heavy lifting and
+        customize only when a competitive advantage results.
+    \end{itemize}
+
+
+    \item \textbf{Leading with data.}
+    
+    \noindent
+    At this stage, the company is data-driven. The automated pipelines
+    and systems created  by data engineers allow people within the
+    company to do self-service analytics and ML. Introducing new data
+    sources is seamless, and tangible value is derived. Data engineers
+    implement proper controls and practices to ensure that data is
+    always available to the people and systems.
+
+    A data engineer will continue building on prior stages, plus they
+    will do the following
+    \footnote{
+        Issues to watch out for include the following:
+        \begin{itemize}
+            \item At this stage, complacency is a significant danger.
+            \item Technology distractions are a more significant danger
+            here than in the other stages. There's a temptation to
+            pursue expensive hobby projects that don't deliver value
+            to the business. Utilize custom-built technology only where
+            it provides a competitive advantage.
+        \end{itemize}
+    }:
+    \begin{itemize}
+        \item Create automation for the seamless introduction and usage
+        of new data.
+        \item Focus on building custom tools and systems that leverage
+        data as a competitive advantage.
+        \item Focus on the “enterprisey” aspects of data, such as data
+        management (including data governance and quality) and DataOps.
+        \item Deploy tools that expose and disseminate data throughout
+        the organization, including data catalogs, data lineage tools,
+        and metadata management systems.
+        \item Collaborate efficiently with software engineers,
+        ML engineers, analysts, and others.
+        (shouldn't this be from stage 1?).
+        \item Create a community and environment where people can
+        collaborate and speak openly, no matter their role or position
+        (shouldn't this be from stage 1?).
+    \end{itemize}
+\end{enumerate}
+

@@ -1,0 +1,763 @@
+\section{Data Generation in Source Systems}
+Let's go in depth for the first step in the data engineering lifecycle:
+the generation of data. Before getting the raw data, it is important to
+understand where the data exists, how it is generated, and its
+characteristics and quirks. Understanding the nature of data as it's 
+created in source systems is critical.
+
+
+
+\subsection{Sources of Data: How Is Data Created?}
+Data is an unorganized, context-less collection of facts and figures.
+It can be created in many ways, both analog and digital:
+\begin{itemize}
+    \item \textbf{Analog data} is generated from non-digital
+    processes
+    \footnote{
+        e.g. vocal speech, writing on paper, playing an instrument.
+    }.
+
+    \item \textbf{Digital data} is either created by converting analog
+    data to digital form or is the native product of a digital system
+    \footnote{
+        e.g. microphone, texting apps, credit card transactions, 
+    }.
+\end{itemize}
+If possible, get familiar with your source system and how it generates
+data. Put in the effort to read the source system documentation and
+understand its patterns and quirks. Research what might affect your
+ability to ingest from it.
+
+
+
+
+\subsection{Source Systems: Main Ideas}
+Source systems produce data in various ways. The frequently
+encountered concepts are:
+\begin{itemize}
+    \item \textbf{Files and Unstructured Data}
+
+    \noindent
+    A file is a sequence of bytes, typically stored on a disk.
+    
+    Applications often write data to files.
+    
+    Files may store local parameters, events, logs, images, and
+    audio.
+
+
+    \item \textbf{APIs}
+
+    \noindent
+    Application programming interfaces (APIs) are a standard way of
+    exchanging data between systems.
+    
+    In theory, APIs simplify the data ingestion task for data
+    engineers. In practice, many APIs still expose a good deal of
+    data complexity for engineers to manage.
+
+
+    \item \textbf{Application Databases (OLTP Systems)}
+
+    \noindent
+    An application database stores the state of an application
+    \footnote{
+        e.g. a database that stores account balances for bank
+        accounts. As customer transactions and payments happen,
+        the application updates bank account balances.
+    }.
+
+    Typically, an application database is an online transaction
+    processing (OLTP) system, that is, a database that reads
+    and writes individual data records at a high rate.
+
+    ACID characteristics guarantee that the database will maintain
+    a consistent picture of the world, dramatically simplifying
+    the app developer's task. Although, relaxing these constraints
+    can be a considerable boon to performance and scale.
+
+
+    \item \textbf{Online Analytical Processing System}
+
+    \noindent
+    an online analytical processing (OLAP) system is built to run
+    large analytics queries and is typically inefficient at
+    handling lookups of individual records.
+
+
+    \item \textbf{Change Data Capture}
+    
+    \noindent
+    Change data capture (CDC) is a method for extracting each
+    change event (insert, update, delete) that occurs in a
+    database. CDC is frequently leveraged to replicate
+    between databases in near real time or create an event
+    stream for downstream processing.
+
+
+    \item \textbf{Logs}
+    
+    \noindent
+    A log captures information about events that occur in systems
+    \footnote{
+        e.g. a log may capture traffic and usage patterns on a
+        web server. Your computer's OS logs events as the system
+        boots and when applications start or crash.
+    }.
+
+    Logs are a rich data source, potentially valuable for
+    downstream data analysis, ML, and automation.
+
+    All logs track events and event metadata. At a minimum, a
+    log should capture who, what, and when.
+
+    \item \textbf{CRUD}
+    
+    \noindent
+    CRUD, which stands for create, read, update, and delete, is a
+    transactional pattern commonly used in programming and
+    represents the four basic operations of persistent storage.
+
+
+    \item \textbf{Insert-Only}
+    
+    \noindent
+    The insert-only pattern retains history directly in a table
+    containing data. Rather than updating records, new records
+    get inserted with a timestamp indicating when they were
+    created.
+
+    In a sense, the insert-only pattern maintains a database
+    log directly in the table itself, making it especially
+    useful if the application needs access to history
+    \footnote{
+        e.g. the insert-only pattern would work well for a
+        banking application designed to present customer
+        address history
+    }.
+
+    Insert-only has a couple of disadvantages:
+    \begin{enumerate}
+        \item tables can grow quite large,
+         if data frequently changes.
+        \item record lookups incur extra overhead
+        because looking up the current state
+        involves filtering by max timestamp.
+    \end{enumerate}
+    
+
+    \item \textbf{Messages and Streams}
+    
+    \noindent
+    Related to event-driven architecture, two terms that
+    you'll often see used interchangeably are message
+    queue and streaming platform, but a subtle but
+    essential difference exists between the two.
+
+    A message is raw data communicated across two or more systems.
+    By contrast, a stream is an append-only log of event records.
+
+    \item \textbf{Types of Time}
+    
+    \noindent
+
+    While time is an essential consideration for all data
+    ingestion, it becomes that much more critical and subtle
+    in the context of streaming, where we view data as continuous
+    and expect to consume it shortly after it is produced.
+    
+    There are three key types of time when ingesting data:
+    \begin{enumerate}
+        \item Event time indicates when an event is generated
+        in a source system, including the timestamp of the
+        original event itself.
+
+        \item Ingestion time indicates when an event
+        is ingested from source systems into a message queue,
+        cache, memory, object storage, a database, or any place
+        else that data is stored.
+
+        \item Process time occurs after ingestion time, when
+        the data is processed (typically, a transformation).
+
+        \item Processing time is how long the data took to
+        process, measured in seconds, minutes, hours, etc.
+    \end{enumerate}
+    Use these timestamp logs to accurately track the movement of
+    your data through your data pipelines.
+\end{itemize}
+
+
+
+\subsection{Source System Practical Details}
+This information will have a shorter shelf life than the main
+ideas discussed previously. Nevertheless, these details are
+critical knowledge for working data engineers. We suggest that
+you study this information as baseline knowledge but read
+extensively to stay abreast of ongoing developments.
+
+
+\subsection*{Databases}
+Here  are some major ideas that occur across a variety of
+database technologies, including those that back software
+applications and those that support analytics use cases:
+\begin{itemize}
+    \item A Database Management System (DBMS) used to
+    store and serve data. It consists of a storage engine,
+    query optimizer, disaster recovery, and other key
+    components for managing the database system.
+
+    \item Lookups: How does the database find and
+    retrieve data?
+    
+    Indexes can help speed up lookups, but not all
+    databases have indexes\footnote{
+        Know whether your database uses indexes;
+        if so, what are the best patterns for
+        designing and maintaining them?
+
+        Understand how to leverage for efficient
+        extraction. It also helps to have a basic
+        knowledge of the major types of indexes,
+        including B-tree and log-structured
+        merge-trees.
+    }.
+
+    \item Query optimizer: Does the database
+    utilize an optimizer? What are its
+    characteristics?
+
+    \item Scaling and distribution: Does the
+    database scale with demand? What scaling
+    strategy does it deploy? Does it scale
+    horizontally (more database nodes) or
+    vertically (more resources on a
+    single machine)?
+
+    \item Modeling patterns: What modeling patterns
+    work best with the database
+    \footnote{
+        e.g., data normalization or wide tables
+    }?
+
+    \item CRUD: How is data queried, created, updated,
+    and deleted in the database? Every type of
+    database handles CRUD operations differently.
+
+    \item Consistency: Consistency
+    Is the database fully consistent, or does it
+    support a relaxed consistency model?
+
+    Does the database support optional consistency
+    modes for reads and writes?
+\end{itemize}
+
+These are the main types of databases you'll encounter:
+\begin{enumerate}
+    \item Relational database management system (RDBMS). 
+    
+    Data is stored in a table of relations (rows), and each
+    relation contains multiple fields or attributes (columns).
+
+    Each relation in the table has the same schema (a sequence
+    of columns with assigned static types such as string, integer,
+    or float). Rows are typically stored as a contiguous sequence
+    of bytes on disk.
+
+    Tables are typically indexed by a primary key, a unique field
+    for each row in the table. The indexing strategy for the
+    primary key is closely connected with the layout of the table
+    on disk.
+
+    Tables can also have various foreign keys—fields with values
+    connected with the values of primary keys in other tables,
+    facilitating joins, and allowing for complex schemas that
+    spread data across multiple tables. In particular, it is
+    possible to design a normalized schema. Normalization is a
+    strategy for ensuring that data in records is not duplicated
+    in multiple places, thus avoiding the need to update states
+    in multiple locations at once and preventing inconsistencies.
+
+
+    \item Nonrelational databases (NoSQL) refers to a whole class
+    of databases that abandon the relational paradigm.
+
+    On the one hand, dropping relational constraints can improve
+    performance, scalability, and schema flexibility. But as
+    always in architecture, trade-offs exist. NoSQL databases
+    also typically abandon various RDBMS characteristics, such
+    as strong consistency, joins, or a fixed schema.
+
+    There are numerous flavors of NoSQL database designed for
+    almost any imaginable use case. Because there are far too
+    many NoSQL databases to cover exhaustively in this section,
+    we consider the following database types:
+    \begin{itemize}
+        \item A key-value database is a nonrelational database
+        that retrieves records using a key that uniquely
+        identifies each record. This is similar to hash
+        map or dictionary data structures presented in many
+        programming languages but potentially more scalable.
+
+        \item A document store is a specialized key-value store.
+        In this context, a document is a nested object; we can
+        usually think of each document as a JSON object for
+        practical purposes. Documents are stored in collections
+        and retrieved by key. A collection is roughly equivalent
+        to a table in a relational database.
+
+        One key difference between relational databases and
+        document stores is that the latter does not support joins.
+        This means that data cannot be easily normalized, i.e.,
+        split across multiple tables.
+
+        \item A wide-column database 
+        \footnote{
+            These databases can scale to extremely high write
+            rates and vast amounts of data. Specifically,
+            widecolumn databases can support petabytes of data,
+            millions of requests per second, and sub-10ms latency.
+        }
+        is optimized for storing massive amounts of data with
+        high transaction rates and extremely low latency. 
+
+        \item Graph databases explicitly store data with a
+        mathematical graph structure. Roughly speaking, graph
+        databases are a good fit when you want to analyze the
+        connectivity between elements.
+
+        \item A search database is a nonrelational database
+        used to search your data's complex and straightforward
+        semantic and structural characteristics. Two prominent
+        use cases exist for a search database: text search and
+        log analysis.
+
+        Text search involves searching a body of text for keywords
+        or phrases, matching on exact, fuzzy, or semantically
+        similar matches.
+        
+        Log analysis is typically used for anomaly detection,
+        real-time monitoring, security analytics, and operational
+        analytics. Queries can be optimized and sped up with the
+        use of indexes.
+
+        \item A time series is a series of values organized by
+        time
+        \footnote{
+            e.g. stock prices might move as trades are executed
+            throughout the day, or a weather sensor will take
+            atmospheric temperatures every minute.
+        }. 
+        Any events that are recorded over time—either regularly
+        or sporadically—are time-series data. A time-series
+        database is optimized for retrieving and statistical
+        processing of time-series data.
+
+        Time-series databases address the needs of growing,
+        high-velocity data volumes from IoT, event and application
+        logs, ad tech, and fintech, among many other use cases.
+        Often these workloads are write-heavy. As a result,
+        time-series databases often utilize memory buffering to
+        support fast writes and reads.
+
+        We should distinguish between measurement and event-based
+        data, common in time-series databases. Measurement data
+        is generated regularly, such as temperature or air-quality
+        sensors. Event-based data is irregular and created every
+        time an event occurs.
+    \end{itemize}
+\end{enumerate}
+
+
+\subsection*{APIs}
+APIs are now a standard and pervasive way of exchanging data in
+the cloud, for SaaS platforms, and between internal company
+systems.
+
+\begin{itemize}
+    \item REST
+    
+
+    \item GraphQL
+    
+
+    \item Webhooks
+    
+
+    \item RPC and gRPC
+\end{itemize}
+
+%  combine with tex 1.1
+
+
+
+
+
+\subsection*{Data Sharing}
+The core concept of cloud data sharing is that a multitenant
+system supports security policies for sharing data among tenants.
+Concretely, any public cloud object storage system with a
+fine-grained permission system can be a platform for data sharing.
+
+Data sharing can streamline data pipelines within an organization.
+Data sharing allows units of an organization to manage their data
+and selectively share it while still allowing individual units to
+manage their compute and query costs separately, facilitating
+data decentralization.
+
+
+\subsection*{Third-Party Data Sources}
+The consumerization of technology means every company is
+essentially now a technology company. The consequence is that
+these companies want to make their data available to their users
+\footnote{
+    Why would companies want to make their data available?
+    
+    Data is sticky, and a flywheel is created by allowing users
+    to integrate and extend their application into a user's
+    application.
+    
+    Greater user adoption and usage means more data, which means
+    users can integrate more data into their applications and
+    data systems. The side effect is there are now almost infinite
+    sources of third-party data.
+},
+either as part of their service or as a separate subscription.
+
+Direct third-party data access is commonly done via APIs, through
+data sharing on a cloud platform, or through data download.
+
+
+\subsection*{Message Queues and Event-Streaming Platforms}
+Event-driven architectures are pervasive in software applications
+and are poised to grow their popularity even further:
+\begin{enumerate}
+    \item Message queues and event streaming platforms,
+    critical layers in event-driven architectures, are easier to
+    set up and manage in a cloud environment.
+
+    \item The rise of data apps—applications that directly
+    integrate real-time analytics—are growing from strength to
+    strength.
+\end{enumerate}
+
+
+
+
+
+
+
+\subsection{Whom You'll Work With}
+System and Data Stakeholders.
+
+
+
+\subsection{Undercurrents and Their Impact on Source Systems}
+Source systems are generally outside the control of the data
+engineer. There's an implicit assumption that the stakeholders
+and owners of the source systems, and the data they produce, are
+following best practices concerning data management, DataOps
+(and DevOps), DODD data architecture, orchestration, and software
+engineering.
+
+The data engineer should get as much upstream support as possible
+to ensure that the undercurrents are applied when data is
+generated in source systems. Doing so will make the rest of the
+steps in the data engineering lifecycle proceed a lot more
+smoothly.
+
+
+\subsection*{Security}
+Security is critical, and the last thing you want is to
+accidentally create a point of vulnerability in a source system.
+Here are some areas to consider:
+\begin{itemize}
+    \item Is the source system architected so data is secure and
+    encrypted, both with data at rest and while data is
+    transmitted?
+
+    \item Do you have to access the source system over the public
+    internet, or are you using a virtual private network (VPN)?
+
+    \item Keep passwords, tokens, and credentials to the source
+    system securely locked away
+    \footnote{
+        e.g. if you're using Secure Shell (SSH) keys, use a key
+        manager to protect your keys; the same rule applies to
+        passwords—use a password manager or a single sign-on
+        (SSO) provider.
+    }
+    
+    \item Do you trust the source system? Always be sure to trust
+    but verify that the source system is legitimate. You don't
+    want to be on the receiving end of data from a malicious actor.
+\end{itemize}
+
+
+
+\subsection*{Data Management}
+Data management of source systems is challenging for data
+engineers. In most cases, you will have only peripheral
+control, if any control at all, over source systems and
+the data they produce. To the extent possible, you should
+understand the way data is managed in source systems since
+this will directly influence how you ingest, store, and transform
+the data.
+
+Here are some areas to consider:
+\begin{itemize}
+    \item \textbf{Data governance}
+    
+    \noindent
+    Are upstream data and systems governed in a reliable,
+    easy-to-understand fashion?
+
+    Who manages the data?
+
+
+    \item \textbf{Data quality}
+    
+    \noindent
+    How do you ensure data quality and integrity in upstream
+    systems?
+    
+    Work with source system teams to set expectations on data
+    and communication.
+
+
+    \item \textbf{Schema}
+    
+    \noindent
+    Expect that upstream schemas will change. Where possible,
+    collaborate with source system teams to be notified of
+    looming schema changes.
+
+
+    \item \textbf{Master data management}
+    
+    \noindent
+    Is the creation of upstream records controlled by a master
+    data management practice or system?
+
+
+    \item \textbf{Privacy and ethics}
+    
+    \noindent
+    Do you have access to raw data, or will the data be obfuscated?
+    
+    What are the implications of the source data?
+    
+    How long is it retained?
+    
+    Does it shift locations based on retention policies?
+
+
+    \item \textbf{Regulatory}
+    
+    \noindent
+    Based upon regulations, are you supposed to access the data?
+
+\end{itemize}
+
+
+
+\subsection*{DataOps}
+
+
+\begin{itemize}
+    \item \textbf{Automation}
+    
+    \noindent
+    There's the automation impacting the source system, such as
+    code updates and new features. Then there's the DataOps
+    automation that you've set up for your
+    data workflows.
+    
+    Does an issue in the source system's automation impact your
+    data workflow automation? If so, consider decoupling these
+    systems so they can perform automation independently.
+
+
+    \item \textbf{Observability}
+    
+    \noindent
+    How will you know when there's an issue with a source system,
+    such as an outage or a data-quality issue?
+
+    Set up monitoring for source system uptime.
+
+    Set up checks to ensure that data from the source system
+    conforms with expectations for downstream usage
+    \footnote{
+        e.g. is the data of good quality?
+
+        Is the schema conformant?
+        
+        Are customer records consistent?
+        
+        Is data hashed as stipulated by the internal policy?
+    }.
+
+    \item \textbf{Incident Response}
+    
+    \noindent
+    What's your plan if something bad happens?
+    \footnote{
+        how will your data pipeline behave if a source system goes
+        offline?
+
+        What's your plan to backfill the “lost” data once the
+        source system is back online?
+    }
+\end{itemize}
+
+
+
+\subsection*{Data Architecture}
+You should also understand how the upstream architecture is
+designed and its strengths and weaknesses. Talk often with the
+teams responsible for the source systems to understand the factors
+discussed in this section and ensure that their systems can meet
+your expectations. Knowing where the architecture performs
+well and where it doesn't will impact how you design your data
+pipeline.
+
+Here are some things to consider regarding source system
+architectures:
+\begin{itemize}
+    \item \textbf{Reliability}
+    
+    \noindent
+    All systems suffer from entropy at some point, and outputs
+    will drift from what's expected. Bugs are introduced, and
+    random glitches happen.
+    \begin{itemize}
+        \item Does the system produce predictable outputs?
+        \item How often can we expect the system to fail?
+        \item What's the mean time to repair to get the system
+        back to sufficient reliability?
+    \end{itemize}
+      
+
+    \item \textbf{Durability}
+    
+    \noindent
+    Everything fails, all the time. A server might die, a cloud's
+    zone or region could go offline, or other issues may arise.
+    You need to account for how an inevitable failure or outage
+    will affect your managed data systems.
+    \begin{itemize}
+        \item How does the source system handle data loss from
+        hardware failures or network outages?
+
+        \item What's the plan for handling outages for an extended
+        period and limiting the blast radius of an outage?
+    \end{itemize}
+
+    \item \textbf{Availability}
+    
+    \noindent
+    What guarantees that the source system is up, running, and
+    available when it's supposed to be?
+
+
+    \item \textbf{People}
+    
+    \noindent
+    Who's in charge of the source system's design, and how will
+    you know if breaking changes are made in the architecture?
+
+
+\end{itemize}
+
+
+\subsection*{Orchestration}
+When orchestrating within your data engineering workflow, you'll
+primarily be concerned with making sure your orchestration can
+access the source system, which requires the correct network
+access, authentication, and authorization.
+
+Here are some things to think about concerning orchestration for
+source systems:
+\begin{itemize}
+    \item \textbf{Cadence and frequency}
+    
+    \noindent
+    Is the data available on a fixed schedule, or can you access
+    new data whenever you want?
+
+
+    \item \textbf{Common frameworks}
+    
+    \noindent
+    Do the software and data engineers use the same container
+    manager, such as Kubernetes?
+    
+    Would it make sense to integrate application and data
+    workloads into the same Kubernetes cluster?
+
+    If you're using an orchestration framework like Airflow, does
+    it make sense to integrate it with the upstream application
+    team? There's no correct answer here, but you need to balance
+    the benefits of integration with the risks of tight coupling.
+\end{itemize}
+
+
+\subsection*{Software Engineering}
+As the data landscape shifts to tools that simplify and automate
+access to source systems, you'll likely need to write code.
+Here are a few considerations when writing code to access a
+source system:
+
+
+\begin{itemize}
+    \item \textbf{Networking}
+    
+    \noindent
+    Make sure your code will be able to access the network where
+    the source system resides. Also, always think about secure
+    networking.
+    
+    Are you accessing an HTTPS URL over the public internet, SSH,
+    or a VPN?
+
+    \item \textbf{Authentication and Authorization}
+    
+    \noindent
+    Do you have the proper credentials (tokens, username/passwords)
+    to access the source system?
+    
+    Where will you store these credentials so they don't appear in
+    your code or version control?
+    
+    Do you have the correct IAM roles to perform the coded tasks?
+
+    \item \textbf{Access patterns}
+    
+    \noindent
+    How are you accessing the data? Are you using an API, and how
+    are you handling REST/GraphQL requests, response data volumes,
+    and pagination?
+    
+    If you're accessing data via a database driver, is the driver
+    compatible with the database you're accessing?
+    
+    For either access pattern, how are things like retries and
+    timeouts handled?
+    
+    \item \textbf{Orchestration}
+    
+    \noindent
+    Does your code integrate with an orchestration framework,
+    and can it be executed as an orchestrated workflow?
+    
+    \item \textbf{Parallelization}
+    
+    \noindent
+    How are you managing and scaling parallel access to source systems?
+
+    \item \textbf{Deployment}
+    
+    \noindent
+    How are you handling the deployment of source code changes?
+\end{itemize}

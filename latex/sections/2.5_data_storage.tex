@@ -1,0 +1,658 @@
+\section{Storage}
+Storage is the cornerstone of the data engineering lifecycle and underlies
+its major stages—ingestion, transformation, and serving.
+
+
+
+\subsection{Raw Ingredients of Data Storage}
+
+\begin{enumerate}
+    \item \textbf{Storage Media and Their Trade-offs}
+    \begin{itemize}
+        \item \textbf{Magnetic Disk Drives (HDDs)}: Low-cost, high-capacity storage commonly used in cloud object storage, but slow for random access and transactional workloads.
+        \item \textbf{Solid-State Drives (SSDs)}: High-speed storage with low latency, essential for OLTP databases and caching, but more expensive per gigabyte.
+        \item \textbf{Random Access Memory (RAM)}: Ultra-fast but volatile storage used for caching and in-memory processing, significantly more expensive than SSDs.
+    \end{itemize}
+    
+    \item \textbf{Distributed Storage and Compute}
+    \begin{itemize}
+        \item Cloud object storage enables parallel reads across many disks, improving data access speeds.
+        \item Network bandwidth and latency become critical performance bottlenecks in distributed storage systems.
+    \end{itemize}
+    
+    \item \textbf{Serialization and Data Formats}
+    \begin{itemize}
+        \item \textbf{Serialization} optimizes data storage and transfer by converting data into a storable format.
+        \item \textbf{Row-based formats} (CSV, JSON) are useful for transactional queries but inefficient for large-scale analytics.
+        \item \textbf{Columnar formats} (Parquet) provide better compression and query efficiency for analytical workloads.
+    \end{itemize}
+    
+    \item \textbf{Compression and Its Impact}
+    \begin{itemize}
+        \item \textbf{Storage efficiency}: Compression reduces storage costs and speeds up data scans by reducing data size.
+        \item \textbf{Compute trade-offs}: Compressing and decompressing data adds CPU overhead, requiring careful tuning.
+    \end{itemize}
+    
+    \item \textbf{Caching and Storage Hierarchy}
+    \begin{itemize}
+        \item \textbf{Fast caches} (CPU cache, RAM) store frequently accessed data to reduce latency.
+        \item \textbf{Cloud storage tiers} balance cost and retrieval speed, optimizing data access strategies.
+        \item \textbf{Archival storage} is cost-effective for backups and compliance but has high retrieval latency.
+    \end{itemize}
+    
+    \item \textbf{Networking and CPU Considerations}
+    \begin{itemize}
+        \item \textbf{Distributed storage performance} is influenced by network bandwidth and CPU efficiency.
+        \item \textbf{Cloud availability zones} enhance durability and ensure data availability in case of failures.
+    \end{itemize}
+    
+    \item \textbf{Why This Matters}
+    \begin{itemize}
+        \item Choosing the right storage medium impacts cost, performance, and scalability.
+        \item Optimizing serialization, compression, and caching improves query efficiency and system throughput.
+        \item Distributed architectures require balancing storage, networking, and compute resources for efficiency.
+    \end{itemize}
+\end{enumerate}
+
+A data scientist/engineer should understand these storage fundamentals to build scalable and cost-effective data systems.
+
+
+
+
+\subsection{Data Storage Systems}
+
+\begin{enumerate}
+    \item \textbf{Single Machine vs. Distributed Storage}
+
+    \noindent
+    As data storage needs grow beyond the capacity of a single server,
+    distributed storagesolutions become essential
+    \footnote{
+        Distributed storage systems are integral to modern architectures,
+        supporting technologies such as object storage, Apache Spark,
+        and cloud data warehouses.
+    }.
+    In distributed
+    storage, multiple servers coordinate to store, retrieve, and
+    process data efficiently while providing redundancy in case of
+    failures.
+    
+
+    \item \textbf{Eventual vs. Strong Consistency}
+
+    \noindent
+    A fundamental challenge in distributed systems is maintaining data
+    consistency across multiple nodes. This leads to a trade-off between
+    consistency and availability. Two key consistency paradigms exist:
+    \begin{itemize}
+        \item \textbf{Eventual Consistency:} Ensures that all replicas
+        of a dataset converge to the same value over time. It is common
+        in high-scale distributed systems where immediate consistency is
+        not required.
+
+        \item \textbf{Strong Consistency:} Guarantees that reads always
+        return the latest write. It is necessary for applications that
+        require precise data accuracy but comes with increased latency.
+    \end{itemize}
+    Understanding how databases handle consistency is critical for data
+    engineers, who must balance consistency, performance, and availability
+    based on system requirements.
+
+
+    \item \textbf{File Storage}
+
+    \noindent
+    File storage organizes data into a hierarchical directory structure.
+    It supports:
+    \begin{itemize}
+        \item \textbf{Finite length:} Each file has a defined size.
+        \item \textbf{Append operations:} New data can be added at the end
+        of a file.
+        \item \textbf{Random access:} Data can be read or modified at any
+        position within a file.
+    \end{itemize}
+
+
+    \item \textbf{Local Disk Storage}
+
+    \noindent
+    Local filesystems, such as NTFS (Windows) and ext4 (Linux), store data
+    on SSDs or magnetic disks. These systems provide:
+    \begin{itemize}
+        \item Full read-after-write consistency.
+        \item Locking mechanisms for concurrent access.
+        \item Advanced features like journaling, snapshots, redundancy,
+        encryption, and compression.
+    \end{itemize}
+
+
+    \item \textbf{Network-Attached Storage (NAS)}
+
+    \noindent
+    NAS provides shared file storage over a network, offering advantages
+    such as redundancy, resource management, and access control. However,
+    performance may be impacted by network latency. Engineers should understand
+    the consistency models of their NAS solutions, particularly when multiple
+    clients access shared data.
+
+
+    \item \textbf{Cloud Filesystem Services}
+
+    \noindent
+    Cloud-based filesystems, such as Amazon EFS, function similarly to NAS but
+    are fully managed by cloud providers. These services provide:
+    \begin{itemize}
+        \item Automatic scaling.
+        \item Pay-per-use pricing.
+        \item Strong consistency guarantees within a single instance.
+    \end{itemize}
+
+
+    \item \textbf{Block Storage}
+
+    \noindent
+    Block storage operates at a lower level than file storage, interacting directly
+    with storage hardware. Each block is a fixed-size unit of data, typically used
+    by transactional databases and operating systems.
+
+
+    \item \textbf{RAID (Redundant Array of Independent Disks)}
+
+    \noindent
+    RAID systems combine multiple disks to enhance performance, increase capacity,
+    and improve fault tolerance. Various RAID configurations balance speed and redundancy differently.
+
+
+    \item \textbf{RAID (Redundant Array of Independent Disks)}
+
+    \noindent
+    SAN systems provide block-level storage over a network, pooling resources for scalability, redundancy,
+    and optimized performance. These are commonly used in enterprise data centers.
+
+
+    \item \textbf{Cloud Virtualized Block Storage}
+    
+    \noindent
+    Cloud services like Amazon EBS offer virtualized block storage for virtual machines, supporting:
+    \begin{itemize}
+        \item High durability through data replication.
+        \item Performance tiers optimized for different workloads.
+        \item Snapshot capabilities for backup and disaster recovery.
+    \end{itemize}
+
+    \item \textbf{Local Instance Volumes}
+    
+    \noindent
+    Cloud providers offer ephemeral local storage directly attached to VMs. While these volumes
+    provide high performance, they do not persist after VM termination and lack advanced redundancy features.
+
+    \item \textbf{Object Storage}
+    
+    \noindent
+    Object storage is a modern alternative to traditional file storage, designed for scalability and resilience.
+    Cloud-based object storage services, such as Amazon S3, Azure Blob Storage, and Google Cloud Storage,
+    play a critical role in data engineering applications.
+
+    Key characteristics of object storage:
+    \begin{itemize}
+        \item \textbf{Immutable objects:} Objects are written once and cannot be modified; updates require rewriting the entire object.
+        \item \textbf{Scalability:} Supports exabytes of data with automatic scaling.
+        \item \textbf{Parallel access:} Optimized for batch reads and writes, making it ideal for big data applications.
+    \end{itemize}
+    Object storage enables separation of compute and storage, allowing for on-demand scalability in cloud data processing.
+    It is widely used for data lakes, backups, and serving large-scale web content.
+
+
+    \item \textbf{Cache and Memory-Based Storage Systems}
+    
+    \noindent
+    RAM-based storage systems provide ultra-fast retrieval speeds but are volatile and vulnerable to data loss.
+    They are primarily used for caching, rather than long-term storage
+    \footnote{
+        Example: 
+        Redis is a more advanced key-value store supporting lists, sets, and other data structures.
+        It includes built-in persistence mechanisms like snapshotting and journaling, making it
+        suitable for applications that require a balance between speed and durability.
+    }.
+
+
+
+    \item \textbf{The Hadoop Distributed File System (HDFS)}
+    
+    \noindent
+    HDFS was a cornerstone of early big data systems, designed to process large datasets
+    efficiently using the MapReduce model. Unlike object stores, HDFS tightly integrates storage
+    with compute, distributing data across a cluster while maintaining replication for fault tolerance.
+
+    HDFS remains relevant, especially in legacy systems and hybrid cloud architectures.
+    While pure Hadoop ecosystems have declined, HDFS is still used in platforms like Amazon EMR and Apache Spark.
+
+
+
+    \item \textbf{Streaming Storage}
+    
+    \noindent
+    Streaming storage systems, such as Apache Kafka, Amazon Kinesis, and Google Pub/Sub, enable scalable
+    and durable message retention. Kafka, for instance, supports long-term storage by offloading older
+    messages to object storage while maintaining replay capabilities.
+
+
+
+    \item \textbf{Indexes}
+    
+    \noindent
+    Indexes provide a map of the table for particular fields and allow extremely fast
+    lookup of individual records. Without indexes, a database would need to scan an
+    entire table to find the records satisfying a WHERE condition.
+
+    Traditional relational databases rely on indexes to speed up lookups.
+    However, columnar databases optimize for analytical workloads by storing data in
+    column-major format. This minimizes disk reads for queries that access only
+    specific columns. Columnar databases are optimized for:
+    \begin{itemize}
+        \item Large-scale aggregations and transformations.
+    
+        \item High-compression ratios due to columnar similarity.
+        
+        \item Efficient pruning of unnecessary data during queries.
+    \end{itemize}
+
+
+    \item \textbf{Partitioning and Clustering}
+    
+    \noindent
+    Partitioning divides tables into smaller subsets (e.g., by date),
+    reducing query scan time. Clustering sorts data within partitions,
+    colocating similar values for faster filtering and joining
+    \footnote{
+        Example: Snowflake Micro-Partitioning.
+        Snowflake organizes tables into micro-partitions (50-500MB in size),
+        clustering similar values automatically.
+
+        Query performance improves by pruning irrelevant micro-partitions.
+
+        Metadata storage aids efficient query planning, functioning similarly to traditional indexes.
+    }.
+
+\end{enumerate}
+
+
+
+
+
+
+
+\subsection{Data Engineering Storage Abstractions}
+Data engineering storage abstractions are patterns for organizing
+and querying data, built upon underlying storage systems, primarily
+for data science, analytics, and reporting.
+
+Key abstractions discussed include data warehouses, data lakes,
+data lakehouses, and data platforms.
+
+Choosing the right abstraction depends on:
+\begin{itemize}
+    \item \textbf{Purpose/Use Case:} What the data will be used for.
+    \item \textbf{Update Patterns:} Whether it needs optimization
+    for bulk updates, streaming inserts, or upserts.
+    \item \textbf{Cost:} Financial costs, time-to-value, and
+    opportunity costs.
+    \item \textbf{Separation of Storage and Compute:} A major trend
+    blurring the lines between systems like data warehouses and data
+    lakes, impacting speed, cost, and purpose.
+\end{itemize}
+
+
+\subsection*{The Data Warehouse}
+A standard OLAP
+\footnote{
+    On-Line Analytical Processing
+}
+architecture for data centralization, and an organizational pattern
+within a company.
+
+Evolved from traditional databases to MPP systems and now cloud data
+warehouses. Cloud versions can handle raw text/JSON, acting somewhat
+like lakes, but struggle with truly unstructured data (images, video)
+unless paired with object storage.
+
+In practice, cloud data warehouses are often used to organize data
+into a data lake, a storage area for massive amounts of unprocessed
+raw data
+\footnote{
+    The limitation is that cloud data warehouses cannot handle truly
+    unstructured data, such as images, video, or audio, unlike a true
+    data lake.
+}.
+
+
+\subsection*{The Data Lake}
+The data lake was originally conceived as a massive store where data
+was retained in raw and unprocessed form, [often built on Hadoop]
+for cost-effective storage.
+
+Recent trends include moving storage to cloud object storage
+(separating compute) and realizing the need for features like
+schema management and updates, which spurred the lakehouse concept.
+
+
+\subsection*{The Data Lakehouse}
+Combines data lake and data warehouse features. As it is generally
+conceived, the lakehouse stores data in object storage just like
+a lake
+\footnote{
+    We would be remiss not to point out that the architecture of
+    the data lakehouse is similar to the architecture used by
+    various commercial data platforms, including BigQuery and
+    Snowflake. These systems store data in object storage and
+    provide automated metadata management, table history,
+    and update/delete capabilities.
+    
+    The complexities of managing underlying files and storage are
+    fully hidden from the user.
+}.
+
+Its key advantage over proprietary platforms is interoperability
+due to open formats, allowing various tools to access data
+directly. It allows imposing structure where needed while leaving
+other data raw.
+
+
+
+\subsection*{Data Platforms}
+Vendor-driven ecosystems offering integrated tools around a core
+storage layer, often including object storage integration.
+They aim to simplify data engineering but can lead to vendor
+lock-in. The concept is still evolving.
+
+However, the race is on to create a walled garden of data tools,
+both simplifying the work of data engineering and generating
+significant vendor lock-in.
+
+
+
+\subsection*{Stream-to-Batch Storage Architecture}
+Similar to Lambda architecture, where data streams are sent to
+multiple consumers. Some process data in real-time, while a batch
+consumer writes data to long-term storage (like object storage or
+a specialized buffer like BigQuery's) for batch querying. This
+allows querying combined near real-time and historical data.
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Big Ideas and Trends in Storage}
+The following text summarizes key concepts and trends influencing data
+storage architecture in data engineering.
+
+
+
+\subsection*{Data Catalog}
+A data catalog is a metadata repository for all organizational data
+(operational and analytical).
+\begin{itemize}
+    \item  It integrates with various systems, often using automated
+    scanning and APIs, to collect and infer metadata
+    (schemas, relationships, sensitive data).
+    
+    \item Catalogs provide a user interface for data discovery,
+    understanding relationships, and collaboration, supporting both
+    technical use cases (like table discovery in lakehouses) and
+    organizational needs (like data search for analysts).
+\end{itemize}
+
+
+\subsection*{Data Sharing}
+Data sharing allows organizations and individuals to share specific
+data and carefully defined permissions with specific entities.
+
+Facilitated by cloud environments, it aids collaboration but requires
+strong security policies. It's a core feature of many cloud data
+platforms.
+
+
+\subsection*{Schema}
+Describes the structure and organization of data
+\footnote{
+    Note that schema need not be relational.
+    
+    Rather, data becomes more useful when we
+    have as much information about its
+    structure and organization.
+    
+    For images stored in  a data lake, this schema
+    information might explain the image format,
+    resolution, and the way the images fit into
+    a larger hierarchy.
+}
+(format, types, hierarchy, relationships).
+What is the expected form of the data?
+
+What is the file format? Is it structured, semistructured,
+or unstructured?
+What data types are expected? How does the data fit into a larger
+hierarchy?
+Is it connected to other data through shared keys or other
+relationships?
+
+Two main patterns exist:
+\begin{enumerate}
+    \item \textbf{Schema on Write:} (Traditional) Schema is enforced
+    when data is written. Ensures data standards but is less flexible.
+
+    \item \textbf{Schema on Read:} Schema is applied when data is read.
+    Offers flexibility but requires careful handling, ideally with
+    self-describing formats (like Parquet).
+\end{enumerate}
+
+
+\subsection*{Separation of Compute from Storage}
+Separation of Compute from Storage is a dominant cloud pattern where
+storage (often object storage) is decoupled from processing units.
+\begin{itemize}
+    \item \textbf{Motivation:} Enables ephemeral, scalable compute
+    (pay-as-you-go efficiency for variable workloads) and leverages
+    high durability/availability of cloud object stores.
+
+    \item \textbf{Contrast:} Differs from traditional colocation
+    where compute and data reside together for performance.
+
+    \item \textbf{Hybrid Approaches:} Systems often use multi-tier
+    caching (local storage for intermediate steps) or hybrid object
+    storage (like BigQuery/Colossus, S3 Select) to blend benefits.
+    Examples include EMR using temporary HDFS, Spark using
+    memory/ephemeral filesystems, and Druid using SSDs backed by
+    object storage for durability.
+\end{itemize}
+
+
+Snowflake's multi-cluster, shared data architecture is built on three
+distinct layers:
+\begin{enumerate}
+    \item \textbf{Storage Layer (Data Storage):} This data resides in
+    cloud storage services provided by the underlying cloud platform
+    (like Amazon S3, Azure Blob Storage, or Google Cloud Storage),
+    depending on where your Snowflake account is hosted.
+
+    This layer is designed for durability, scalability, and
+    cost-effectiveness, leveraging the native capabilities of the
+    cloud provider's storage. You pay for storage based on the volume
+    of compressed data you store.   
+
+    \item \textbf{Compute Layer (Query Processing):} this layer
+    consists of Virtual Warehouses. These are the engines that execute
+    your SQL queries and perform data processing tasks.
+    
+    Each warehouse operates independently without competing for
+    resources with other warehouses.
+    You can create multiple Virtual Warehouses of different sizes
+    (e.g., X-Small, Small, Medium, Large, etc.).
+
+    You pay for compute based on the size of the warehouse and how
+    long it runs (per-second billing after the first minute).
+    Warehouses can be suspended (turned off) when not in use to save
+    costs.
+
+    \item \textbf{Cloud Services Layer (Coordination):} This layer acts
+    as the "brain" of Snowflake. It coordinates activities across the
+    system.
+
+    It manages infrastructure, optimizes queries, handles security
+    (authentication, access control), manages metadata
+    (information about tables, schemas, etc.), and ensures transactional
+    consistency.
+\end{enumerate}
+
+
+
+\subsection*{Data Storage Lifecycle and Data Retention}
+
+\begin{enumerate}
+    \item \textbf{Lifecycle (Temperature):} Classifies data based on
+    access frequency:
+    \begin{itemize}
+        \item \textbf{Hot:} Frequent access, fastest/most expensive storage
+        (SSD, memory).
+        \item \textbf{Warm:} Semi-regular access, intermediate storage tiers.
+        \item \textbf{Cold:} Infrequent access (archival), cheapest storage,
+        slow/costly retrieval.
+    \end{itemize}
+    Use automated lifecycle policies to manage tiers and costs effectively.
+
+    \item \textbf{Retention:} Deciding how long to keep data, considering: 
+    \begin{itemize}
+        \item \textbf{Value:} Importance and replaceability.
+        \item \textbf{Time:} Value often decreases with age; TTL for hot
+        storage.
+        \item \textbf{Compliance:} Regulatory requirements for keeping or
+        deleting data.
+        \item \textbf{Cost:} Balancing storage costs against data value and
+        retention needs. Avoid hoarding useless data.
+    \end{itemize}
+
+\end{enumerate}
+
+
+
+\subsection*{Single-Tenant Versus Multitenant Storage}
+
+\begin{itemize}
+    \item \textbf{Single-Tenant:} Each tenant gets dedicated, isolated
+    storage resources. Allows customization but can complicate cross-tenant
+    operations.
+
+    \item \textbf{Multitenant:} Multiple tenants share storage resources.
+    More efficient infrastructure use but requires careful isolation and
+    uniform structure.
+\end{itemize}
+
+
+
+
+
+\subsection{Undercurrents}
+Because storage is ubiquitous, these undercurrents differ slightly
+from those affecting data in motion or transformation.
+
+\begin{itemize}
+    \item \textbf{Security:}
+    \begin{itemize}
+        \item Viewed as an \textit{enabler} for wider data sharing
+        by ensuring safety, thus increasing data value.
+        \item Requires robust protection for data at rest and in
+        motion.
+        \item Emphasizes fine-grained access control (column, row,
+        cell-level) and the principle of least privilege.
+    \end{itemize}
+
+    \item \textbf{Data Management:}
+    \begin{itemize}
+        \item Critical for reading from and writing to storage
+        systems effectively.
+
+        \item \textit{Metadata Management:} Enhances data value
+        through catalogs (discovery), lineage (tracing),
+        dictionaries (knowledge sharing), and supports governance.
+        Active metadata analysis provides insights.
+
+        \item \textit{Data Versioning:} Especially in object storage,
+        aids error recovery and tracking dataset history
+        (valuable for ML model debugging).
+    \end{itemize}
+
+    \item \textbf{Privacy:}
+    \begin{itemize}
+        \item Regulations (e.g., GDPR) significantly impact storage
+        design and data handling.
+
+        \item Necessitates managing the lifecycle of private data,
+        including processes for deletion requests.
+
+        \item Involves techniques like anonymization and masking to
+        protect sensitive information.
+    \end{itemize}
+
+    \item \textbf{DataOps:}
+    \begin{itemize}
+        \item Focuses on operational aspects, including monitoring of
+        storage systems and data quality.
+
+        \item \textit{Systems Monitoring:} Covers infrastructure,
+        serverless components (object storage), cost management
+        (FinOps), security configurations, and access patterns.
+
+        \item \textit{Data Observability/Monitoring:} Actively 
+        understanding data characteristics, tracking statistics,
+        detecting anomalies, and validating consistency.
+    \end{itemize}
+
+    \item \textbf{Data Architecture:}
+    \begin{itemize}
+        \item Recognizes storage as a fundamental architectural
+        component.
+
+        \item Requires designing for specific reliability and
+        durability needs.
+
+        \item Involves understanding upstream sources and
+        downstream access patterns/query types.
+
+        \item Includes planning for data growth, managing costs
+        (FinOps), and preparing for scale.
+
+        \item Generally favors fully managed systems, understanding
+        their Service Level Agreements (SLAs).
+    \end{itemize}
+
+    \item \textbf{Orchestration:}
+    \begin{itemize}
+        \item Deeply interconnected with storage, as it manages
+        data flow through pipelines involving storage steps.
+
+        \item Helps manage the complexity of integrating multiple
+        storage systems and query engines.
+    \end{itemize}
+
+    \item \textbf{Software Engineering:}
+    \begin{itemize}
+        \item Involves writing code that interacts correctly and
+        efficiently with storage systems.
+
+        \item Promotes using Infrastructure as Code (IaC) to define
+        and manage storage resources.
+        
+        \item Leverages ephemeral compute resources alongside
+        persistent storage (often object storage), enabled by
+        compute-storage separation, for clean and scalable
+        infrastructure.
+    \end{itemize}
+\end{itemize}
+
+

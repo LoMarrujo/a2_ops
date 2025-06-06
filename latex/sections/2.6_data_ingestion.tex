@@ -1,0 +1,713 @@
+\section{Ingestion}
+\textbf{Data ingestion} is the process of moving data from one
+place to another
+\footnote{
+    Data ingestion is not the same as data integration. 
+    
+    Data ingestion is data movement from point A to B,
+    data integration combines data from disparate sources
+    into a new dataset.
+
+    Data ingestion is different from internal ingestion
+    within a  system. Data stored in a database is copied
+    from one table to another, or data in a stream is
+    temporarily cached.
+}.
+
+Data ingestion implies data movement from source systems into
+storage in the data engineering lifecycle, with ingestion as an
+intermediate step. That is, after generating the data at the
+source system it needs to be moved into storage and the ingestion
+is the connection between source and storage.
+
+\textbf{A data pipeline} is a the combination of architecture,
+systems, and processes that move data through the stages of
+the data engineering lifecycle. Therefore, a data pipeline
+allows automation of movement, transformation, and management
+of dataa from one or more sources to a designated destination,
+often for analysis or storage.
+
+
+
+\subsection{Key Engineering Considerations for the Ingestion Phase}
+When preparing to architect or build an ingestion system, here are
+some primary considerations and questions to ask yourself related
+to data ingestion:
+
+\begin{itemize}
+    \item What's the use case for the data I'm ingesting?
+    \item Can I reuse this data and avoid ingesting multiple
+    versions of the same dataset?
+    \item Where is the data going? What's the destination?
+    \item How often should the data be updated from the source?
+    \item What is the expected data volume?
+    \item What format is the data in? Can downstream storage and
+    transformation accept this format?
+    \item Is the source data in good shape for immediate downstream
+    use?
+    \item What is the the quality of the data?
+    \item What post-processing is required to serve it?
+    \item Does the data require in-flight processing for downstream
+    ingestion if the data is from a streaming source?
+\end{itemize}
+
+Consider these factors when designing your ingestion architecture:
+\begin{itemize}
+    \item \textbf{Bounded Versus Unbounded Data}
+    
+    \noindent
+    "All data is unbounded until it's bounded." That is, data exists
+    in two forms:
+    \begin{enumerate}
+        \item \textbf{Unbounded Data} is data as it occurs in reality,
+        representing ongoing events that happen continuously or
+        sporadically. Think of it as a constant flow.
+        
+        \item \textbf{Bounded Data} is collected or grouped within
+        specific boundaries, often time-based (like daily reports).
+        It's a way of putting unbounded data into manageable buckets.
+
+    \end{enumerate}
+    While simple examples like a shopping list might seem
+    inherently bounded, most data, especially in business
+    (like continuous online transactions),
+    starts as an unbounded stream.
+    
+    Businesses often create artificial boundaries (batches) for
+    processing. Streaming systems are highlighted as tools that
+    help manage and process data while preserving its original,
+    unbounded nature.
+
+    \item \textbf{Frequency}
+    
+    \noindent
+    Choosing the data ingestion frequency is a critical decision for
+    data engineers. Ingestion can occur in different patterns:
+    \begin{itemize}
+        \item \textbf{Batch:} Data is processed in large, scheduled
+        chunks (e.g., yearly tax data).
+
+        \item \textbf{Micro-batch:} Data is processed in small,
+        frequent batches (e.g., log updates every minute).
+
+        \item \textbf{Real-time (Streaming):} Data is processed
+        continuously, either event-by-event or in tiny
+        micro-batches, as it arrives (e.g., IoT sensor data
+        processed within seconds).
+    \end{itemize}
+    
+    Some key points regarding frequency:
+    \begin{itemize}
+        \item The term "Real-time"
+        \footnote{
+            The terms "real-time" and "streaming" are used
+            interchangeably.
+        }
+        is often used for brevity but technically means
+        "near real-time" because all systems have some inherent
+        latency.
+        \item  Ingestion frequencies vary widely based on use cases
+        and technology.
+        \item Companies often use a mix of batch and streaming
+        ingestion.
+        \item Even when ingestion is streaming, downstream processes
+        (like ML) are often still done in batches.
+        \item Data engineers must decide where batch boundaries will
+        occur in the data lifecycle.
+    \end{itemize}
+
+
+
+    \item \textbf{Synchronous vs. Asynchronous}
+    
+    \noindent
+    \begin{itemize}
+        \item \textbf{Synchronous Ingestion:}
+            \begin{itemize}% Or use label=-, label=*, etc.
+                \item Stages (source, ingestion, destination) are tightly coupled.
+                \item Processes depend directly on the successful completion of the preceding one (e.g., B waits for A, C waits for B).
+                \item Failure at any stage halts subsequent stages.
+                \item Common in older ETL systems processing entire batches sequentially.
+                \item Downstream processes must wait for the full batch ingestion/transformation.
+                \item Failures often require restarting the entire multi-stage process.
+                \item \textit{Example Concern:} Can lead to long delays and difficult debugging if failures occur in complex pipelines (as per the case study).
+            \end{itemize}
+    
+        \item \textbf{Asynchronous Ingestion:}
+            \begin{itemize}
+                \item Decouples stages, allowing dependencies at the individual event level (similar to microservices).
+                \item Often uses buffers (e.g., message queues, streams like Amazon Kinesis) between stages.
+                \item Individual events become available for the next stage as soon as they are processed by the current stage.
+                \item Enables parallel processing of data items as they arrive, rather than waiting for batches.
+                \item Processing rate adapts based on available resources and event flow.
+                \item Buffers act as `shock absorbers', managing load variations and preventing downstream overload during spikes.
+                \item More resilient; failures are typically more isolated.
+                \item \textit{Example Flow:} Web App -> Kinesis Stream (buffer) -> Apache Beam (processing) -> Kinesis Stream -> Kinesis Firehose -> S3 storage.
+            \end{itemize}
+    \end{itemize}
+
+
+    \item \textbf{Serialization and Deserialization}
+    
+    \noindent
+    Moving data from source to destination involves serialization
+    and deserialization
+    \footnote{
+        As a reminder, serialization means encoding
+        the data from a source and preparing data
+        structures for transmission and intermediate
+        storage stages.
+    }.
+
+    When ingesting data, ensure that your destination can
+    deserialize the data it receives.
+    
+    We've seen data ingested from a source but then sitting inert
+    and unusable in the destination because the data cannot be
+    properly deserialized.
+
+
+    \item \textbf{Throughput and scalability}
+    
+    \noindent
+    Data ingestion systems should ideally never be bottlenecks,
+    but in reality, they frequently are. Therefore, designing for
+    adequate throughput and scalability is critical, especially as
+    data volumes increase. Systems should be flexible enough to
+    scale up or down to match data flow.
+    
+    Key considerations include:
+    \begin{itemize}
+        \item \textbf{Source Reliability:} Plan for potential
+        upstream issues. For instance, if a source system goes down,
+        the ingestion process must be capable of handling the
+        sudden influx of backlogged data when the source recovers,
+        without being overwhelmed.
+
+        \item \textbf{Bursty Data:} Data arrival rates are rarely
+        constant. Systems need built-in buffering to temporarily
+        store data during peak rates, preventing data loss while
+        the system potentially scales or catches up.
+
+        \item \textbf{Managed Services:} Whenever possible, leverage
+        managed cloud services designed to handle scaling
+        automatically.
+        
+        Manually managing servers, shards, or workers for scaling is
+        complex, error-prone, and often duplicates effort already
+        solved by managed platforms. Avoid "reinventing the wheel"
+        for ingestion scaling if suitable managed options exist.
+    \end{itemize}
+
+    
+    \item \textbf{Reliability and durability}
+    
+    \noindent
+    Reliability and durability are crucial for data ingestion
+    pipelines.
+    \begin{itemize}
+        \item \textbf{Reliability:} refers to the ingestion system
+        having high uptime and proper failover capabilities.
+        \item \textbf{Durability:} means ensuring that data is not
+        lost or corrupted once received.
+    \end{itemize}
+
+    Designing for reliability and durability involves:
+    \begin{enumerate}
+        \item \item \textbf{Risk Assessment:} Evaluate the impact
+        and cost of potential data loss to determine the appropriate
+        level of redundancy and self-healing needed.
+
+        \item \item \textbf{Cost Considerations:}  Implementing high
+        reliability (e.g., multi-zone/region redundancy, 24/7
+        on-call teams) incurs significant direct costs
+        (cloud infrastructure, labor) and indirect costs
+        (team stress).
+
+        \item \item \textbf{Trade-offs:} There's no universally
+        correct level of reliability/durability. It's essential to
+        continually evaluate the trade-offs between the benefits of
+        increased resilience and the associated costs.
+        
+        \item \item \textbf{Limitations:} Achieving perfect
+        reliability/durability against all possible scenarios
+        (like major infrastructure failures) is unrealistic and
+        often prohibitively expensive. In extreme situations, data
+        ingestion might become irrelevant anyway.
+    \end{enumerate}
+
+    The key takeaway is to make informed decisions by balancing the
+    specific risks and requirements against the practical costs of
+    implementing reliability and durability measures.
+
+    \item \textbf{Payload}
+    
+    \noindent
+    A payload is the dataset being ingested. Its characteristics
+    significantly impact how it's handled. Key characteristics
+    include:
+    \begin{itemize}
+        \item \textbf{Kind:} The data's type (tabular, image, text, etc.)
+        and format (CSV, Parquet, JPG, etc.), which determine structure
+        and processing methods.
+
+        \item \textbf{Shape:} The dimensions of the data
+        (rows/columns for tabular, width/height/depth for images,
+        nesting for JSON, etc.). Shape consistency is vital for
+        compatibility and processes like analysis or model training.
+
+        \item \textbf{Size:} The byte count of the payload. Large
+        payloads can be managed through:
+        \begin{itemize}
+            \item \textbf{Compression:} Using formats like ZIP or
+            TAR to reduce size.
+            
+            \item \textbf{Chunking:} Splitting large files into
+            smaller pieces for easier network transfer and
+            processing, then reassembling them at the destination
+        \end{itemize}
+
+        
+        \item \textbf{Schema and Data Types:}
+        \footnote{
+            Understanding the source schema can be difficult,
+            especially with complex schemas generated by tools
+            like Object-Relational Mappers (ORMs) or opaque
+            vendor APIs. Data engineers may need to delve into
+            application internals or communicate extensively.
+        }
+        Describes the fields and their types within structured
+        (tabular) or semi-structured (JSON) data. Unstructured data
+        lacks a formal schema but may have technical descriptions.
+
+        Source schemas frequently change
+        (columns added/renamed/changed, tables added). 
+
+        \item \textbf{Metadata:} Data about the data payload
+        (includes schema, but also other descriptive info).
+        Metadata is crucial for making data understandable and
+        usable; its absence was a key failing of early data lakes
+        ("data swamps").
+    \end{itemize}
+
+
+
+    \item \textbf{Push vs. Pull vs. Poll Patterns}
+    
+    \noindent
+    \begin{enumerate}
+        \item \textbf{Push:} The source system initiates the data
+        transfer, sending data to the target system.
+
+        \item \textbf{Pull:} The target system initiates the data
+        transfer, requesting and retrieving data directly from
+        the source system.
+
+        \item \textbf{Poll:} This is a variation of the pull
+        pattern. The target system periodically checks the source
+        system for any new or changed data. If changes are detected
+        during polling, the target system then pulls that specific
+        data.        
+    \end{enumerate}
+\end{itemize}
+
+
+
+\subsection{Batch Ingestion Considerations}
+Batch ingestion involves processing data from a source system in
+bulk subsets. These subsets (batches) are typically defined either
+by:
+\begin{itemize}
+    \item \textbf{Time Interval:} Processing data accumulated over
+    a specific period (e.g., daily overnight jobs for reporting,
+    common in traditional  ETL).
+
+    \item \textbf{Size:} Processing data once it reaches a certain
+    size (e.g., creating file objects in a data lake from a stream
+    based on byte size or event count).
+\end{itemize}
+
+Key Patterns and Considerations:
+
+\begin{enumerate}
+    \item \textbf{Snapshot vs. Differential Extraction:}
+    \begin{itemize}[label=\textbullet]
+        \item \textit{Snapshot:} Captures the entire current state of the source system each time. Simple but can be resource-intensive.
+        \item \textit{Differential (Incremental):} Captures only data changes since the last extraction. More efficient but potentially complex.
+    \end{itemize}
+
+    \item \textbf{File-Based Export and Ingestion:}
+    \begin{itemize}[label=\textbullet]
+        \item Source system exports data into files (e.g., CSV, Parquet).
+        \item Files are then transferred (e.g., via Object Storage, SFTP, EDI, SCP) and ingested.
+        \item Considered a \textit{push} pattern (work done on source side).
+        \item Advantages often include better security (no direct DB access) and source control over exported data.
+    \end{itemize}
+
+    \item \textbf{ETL vs. ELT (Extract/Load Focus):}
+    \begin{itemize}[label=\textbullet]
+        \item \textit{Extract (E):} Retrieving data from the source, including potentially metadata/schema.
+        \item \textit{Load (L):} Placing extracted data into target storage. Happens either before transformation (ELT) or after (ETL). Requires considering target system type, schema, and performance.
+    \end{itemize}
+
+    \item \textbf{Inserts, Updates, and Batch Size:}
+    \begin{itemize}[label=\textbullet]
+        \item Many batch-oriented systems (esp. analytical/columnar DBs) perform poorly with frequent, small operations (single-row inserts/updates).
+        \item Prefer larger bulk operations for better performance in such systems.
+        \item Crucial to understand the optimal update patterns for the specific target datastore (e.g., BigQuery streaming buffer vs. standard inserts; Druid/Pinot designed for high insert rates).
+    \end{itemize}
+
+    \item \textbf{Data Migration:}
+    \begin{itemize}[label=\textbullet]
+        \item Involves moving large volumes of data to a new system/environment.
+        \item Key challenges include managing schema differences between systems and redirecting data pipeline connections.
+        \item Best practices: Move data in bulk (often via files/object storage), test schema compatibility beforehand, utilize specialized migration tools for complex jobs.
+    \end{itemize}
+\end{enumerate}
+
+
+
+
+
+
+
+\subsection{Message and Stream Ingestion Considerations}
+Ingesting event data via streams or message queues involves several
+specific considerations beyond basic ingestion:
+\begin{enumerate} % Using enumerate for the main list of considerations
+    \item \textbf{Schema Evolution:}
+    \begin{itemize}[label=\textbullet]
+        \item \textit{Issue:} Event schemas (fields, types) often change, potentially breaking pipelines.
+        \item \textit{Mitigation:} Use \textbf{Schema Registries} for version control.
+        \item \textit{Mitigation:} Implement \textbf{Dead-Letter Queues} (DLQs) to isolate and analyze problematic events.
+        \item \textit{Mitigation:} Proactively \textbf{communicate} with upstream data producers about potential changes.
+    \end{itemize}
+
+    \item \textbf{Late-Arriving Data:}
+    \begin{itemize}[label=\textbullet]
+        \item \textit{Issue:} Events may be ingested significantly later than their occurrence time due to various delays.
+        \item \textit{Impact:} Can skew time-sensitive analyses if ingestion time is assumed to be event time.
+        \item \textit{Handling:} Be aware of the potential impact and consider setting processing cutoffs for late data.
+    \end{itemize}
+
+    \item \textbf{Ordering and Multiple Delivery:}
+    \begin{itemize}[label=\textbullet]
+        \item \textit{Issue:} Distributed systems may deliver messages out of their original order.
+        \item \textit{Issue:} Messages might be delivered more than once (\textit{at-least-once delivery}).
+        \item \textit{Handling:} Design consuming applications to tolerate or correct for these behaviors if necessary.
+    \end{itemize}
+
+    \item \textbf{Replay:}
+    \begin{itemize}[label=\textbullet]
+        \item \textit{Capability:} Allows consumers to re-read messages from a specific point in the stream's history.
+        \item \textit{Usefulness:} Essential for reprocessing data after fixes or logic changes.
+        \item \textit{Examples:} Supported by Kafka, Kinesis, Pub/Sub (but typically not RabbitMQ).
+    \end{itemize}
+
+    \item \textbf{Time to Live (TTL):}
+    \begin{itemize}[label=\textbullet]
+        \item \textit{Definition:} Maximum retention period for unacknowledged messages before automatic deletion.
+        \item \textit{Tuning:} Requires balancing risk of data loss (short TTL) against storage costs and potential backlogs (long TTL).
+        \item \textit{Examples:} Varies by platform (e.g., up to 7 days Pub/Sub, up to 365 days Kinesis, potentially indefinite Kafka).
+    \end{itemize}
+
+    \item \textbf{Message Size:}
+    \begin{itemize}[label=\textbullet]
+        \item \textit{Issue:} Streaming platforms have limits on the maximum size of individual messages.
+        \item \textit{Handling:} Ensure the chosen platform's limit accommodates the largest expected message size.
+        \item \textit{Examples:} ~1MB for Kinesis, default 1MB (configurable) for Kafka.
+    \end{itemize}
+
+    \item \textbf{Error Handling and Dead-Letter Queues (DLQ):}
+    \begin{itemize}[label=\textbullet]
+        \item \textit{Purpose:} To route messages that fail ingestion (e.g., bad format, expired TTL, size limit exceeded).
+        \item \textit{Benefit:} Prevents failed messages from blocking valid ones; allows for diagnosis and potential reprocessing of errors.
+    \end{itemize}
+
+    \item \textbf{Consumer Pull and Push:}
+    \begin{itemize}[label=\textbullet]
+        \item \textit{Pull:} Consumer actively requests messages (e.g., Kafka, Kinesis). Standard for data engineering workflows.
+        \item \textit{Push:} Service actively sends messages to a listening consumer (e.g., Pub/Sub, RabbitMQ support this).
+    \end{itemize}
+
+    \item \textbf{Location:}
+    \begin{itemize}[label=\textbullet]
+        \item \textit{Trade-off:} Balance the benefits of ingesting data close to its source (lower latency) against potential data egress costs if data needs to be moved across regions for centralized analysis.
+    \end{itemize}
+\end{enumerate}
+
+
+
+
+
+
+
+
+
+
+\subsection{Ways to Ingest Data}
+Keep in mind that the universe of data ingestion practices and
+technologies is vast and growing daily.
+
+\begin{enumerate}
+    \item \textbf{Direct Database Connection (ODBC/JDBC):}
+    \begin{itemize}[label=\textbullet]
+        \item Pulls data via network using standard drivers (ODBC, JDBC).
+        \item JDBC is highly portable (JVM-based) and widely used, even from non-JVM languages.
+        \item Can parallelize connections but increases source load.
+        \item Limitations: Older standards struggle with nested data; row-based transfer inefficient for columnar data.
+        \item Often integrated into larger workflows (e.g., read via JDBC, write to object storage).
+    \end{itemize}
+
+    \item \textbf{Change Data Capture (CDC):}
+    \begin{itemize}[label=\textbullet]
+        \item Ingests only \textit{changes} from source databases.
+        \item \textit{Batch-oriented:} Queries based on update timestamps; simple but may miss intermediate changes. Run off-hours or use read replicas.
+        \item \textit{Continuous:} Captures all changes as events (near real-time) via log reading (e.g., Debezium) or managed database triggers.
+        \item \textit{Replication:} Can enable asynchronous replication (loosely coupled, analytics-friendly) vs. native synchronous replication (tightly coupled, read replicas).
+        \item \textit{Considerations:} Consumes source resources; requires testing.
+    \end{itemize}
+
+    \item \textbf{APIs:}
+    \begin{itemize}[label=\textbullet]
+        \item Major data source, but often requires custom code due to lack of standards.
+        \item \textit{Easing Trends:} Vendor client libraries, managed connector platforms, data sharing platforms reduce custom work.
+        \item \textit{Recommendation:} Use managed solutions when possible; follow software best practices for necessary custom connectors.
+    \end{itemize}
+
+    \item \textbf{Message Queues \& Event-Streaming Platforms:}
+    \begin{itemize}[label=\textbullet]
+        \item Common for real-time data (web events, IoT); act as both source and ingestion mechanism.
+        \item \textit{Messages:} Typically transient. \textit{Streams:} Persist logs, enabling replay.
+        \item Workflows can be nonlinear (consume, transform, republish).
+        \item Require careful resource management (bandwidth, compute); consider managed services.
+    \end{itemize}
+
+    \item \textbf{Managed Data Connectors:}
+    \begin{itemize}[label=\textbullet]
+        \item Third-party services/platforms providing pre-built, managed connections.
+        \item Handle syncs, monitoring, errors. Recommended over building common connectors manually.
+    \end{itemize}
+
+    \item \textbf{Moving Data with Object Storage:}
+    \begin{itemize}[label=\textbullet]
+        \item Ideal for bulk data transfer/exchange (data lakes, inter-team/org). Scalable, reliable, secure. Often used as an intermediate stage.
+    \end{itemize}
+
+    \item \textbf{EDI (Electronic Data Interchange):}
+    \begin{itemize}[label=\textbullet]
+        \item Often refers to older methods (email, flash drives). Can be improved with automation (e.g., routing email attachments to object storage).
+    \end{itemize}
+
+    \item \textbf{Databases and File Export:}
+    \begin{itemize}[label=\textbullet]
+        \item Source DBs vary in export performance; large exports can strain transactional systems (use off-hours, replicas).
+        \item Cloud data warehouses are typically optimized for direct export (e.g., to object storage).
+    \end{itemize}
+
+    \item \textbf{File Formats:}
+    \begin{itemize}[label=\textbullet]
+        \item CSV: Common but error-prone (delimiters, no schema/nesting).
+        \item Robust Formats (Parquet, Avro, ORC, Arrow, JSON): Preferred for schema encoding, nesting support, efficiency (especially columnar formats). Use when supported by source.
+    \end{itemize}
+
+    \item \textbf{Shell:}
+    \begin{itemize}[label=\textbullet]
+        \item Using scripts or CLIs (e.g., AWS CLI) for simple ingestion workflows. Consider orchestration tools for complex/critical processes.
+    \end{itemize}
+
+    \item \textbf{SSH (Secure Shell):}
+    \begin{itemize}[label=\textbullet]
+        \item Protocol used securely with other methods: file transfer (SCP), tunneling via bastion hosts to access internal databases.
+    \end{itemize}
+
+    \item \textbf{SFTP and SCP:}
+    \begin{itemize}[label=\textbullet]
+        \item Secure file transfer protocols. Often required when working with partners using SFTP. Require careful security setup.
+    \end{itemize}
+
+    \item \textbf{Webhooks:}
+    \begin{itemize}[label=\textbullet]
+        \item "Reverse APIs": Data provider calls an endpoint hosted by the consumer.
+        \item Consumer builds the receiving endpoint; best practice uses robust services (serverless function -> queue -> processing -> storage).
+    \end{itemize}
+
+    \item \textbf{Web Interface:}
+    \begin{itemize}[label=\textbullet]
+        \item Manual download of data via a website. Unreliable; avoid if automation is possible.
+    \end{itemize}
+
+    \item \textbf{Web Scraping:}
+    \begin{itemize}[label=\textbullet]
+        \item Automatically extracting data from HTML. Legally/ethically complex.
+        \item \textit{Cautions:} Seek alternatives; be responsible (avoid DoS); know legalities; expect high maintenance.
+    \end{itemize}
+
+    \item \textbf{Transfer Appliances:}
+    \begin{itemize}[label=\textbullet]
+        \item Physical devices (e.g., AWS Snowball) shipped for moving massive data (100TB+) faster/cheaper than network. For one-time migrations.
+    \end{itemize}
+
+    \item \textbf{Data Sharing:}
+    \begin{itemize}[label=\textbullet]
+        \item Accessing data directly via platforms (Snowflake, BigQuery, etc.) without taking physical possession. Often read-only; access controlled by provider.
+    \end{itemize}
+
+\end{enumerate}
+
+
+
+
+
+
+
+\subsection{Whom You'll Work With}
+Data ingestion requires collaboration with stakeholders both
+upstream (data producers) and downstream (data consumers).
+
+\begin{itemize}
+    \item \textbf{Upstream Stakeholders:}
+    \begin{itemize}[label=\textbullet]
+        \item Primarily \textbf{Software Engineers} who generate
+        the source data.
+        \item \textit{Challenge:} Often a disconnect exists due
+        to organizational silos and differing priorities; software
+        engineers may not prioritize data quality for downstream
+        analytics.
+        \item \textit{Solution:} Improve \textbf{communication} and
+        foster collaboration.
+        \item \textit{Solution:} Position software engineers as key
+        stakeholders in data engineering outcomes.
+        \item \textit{Solution:} Work with product managers and
+        leadership to align incentives and recognize contributions
+        to data quality and accessibility.
+        \item \textit{Goal:} Encourage better data shaping at the
+        source, proactive communication about changes, and potential
+        collaboration on projects (e.g., event-driven architectures).
+    \end{itemize}
+
+    \item \textbf{Downstream Stakeholders:}
+    \begin{itemize}[label=\textbullet]
+        \item \textit{Immediate Consumers:} Data practitioners like \textbf{Data Scientists} and \textbf{Data Analysts}, plus technology leaders (\textbf{CTOs}).
+        \item \textit{Broader Consumers:} Business leaders and departments such as \textbf{Marketing Directors}, \textbf{Supply Chain VPs}, and \textbf{CEOs}.
+        \item \textit{Challenge:} Potential focus on complex technical projects while neglecting basic, high-value automation needed by key business units (e.g., manual report downloads).
+        \item \textit{Solution:} View data engineering as serving the entire business; recognize and prioritize high-impact basic automation.
+        \item \textit{Solution:} Engage executives to promote a data-driven culture, help break down silos, and establish supportive organizational structures and incentives.
+        \item \textit{Goal:} Delivering value to core business functions can build trust and secure resources for more advanced projects later.
+    \end{itemize}
+\end{itemize}
+
+The common points are:
+\begin{itemize}[label=\textbullet]
+    \item \textbf{Communication} (frequent, honest, and open) with
+    all stakeholders is paramount.
+    \item Essential for ensuring data ingestion efforts provide
+    real business value and align with strategic goals.
+    \item Key to successfully breaking down organizational
+    silos between data producers and consumers.
+\end{itemize}
+
+
+
+
+
+
+\subsection{Undercurrents}
+
+
+
+\begin{itemize}
+    \item \textbf{Security}
+    Moving data during ingestion inherently creates security
+    vulnerabilities risks, as data in transit can potentially be captured
+    or compromised.
+    
+    To mitigate these risks:
+    \begin{itemize}
+        \item \textbf{Understand Data Path:} Be clear about where
+        the data originates (lives) and its destination.
+    
+        \item \textbf{Within VPC Movement:} If data transfer occurs
+        entirely within a Virtual Private Cloud (VPC), utilize
+        secure endpoints and ensure the traffic never leaves the VPC
+        boundary.
+    
+        \item \textbf{Cloud <-> On-Premises Movement:} For transfers
+        between cloud environments and on-premises networks, use
+        secure methods like a VPN (Virtual Private Network) or a
+        dedicated private connection (e.g., AWS Direct Connect,
+        Azure ExpressRoute). Consider this a worthwhile security
+        investment despite potential costs.
+    
+        \item \textbf{Public Internet Movement:} When data must
+        traverse the public internet, it is essential to ensure
+        the transmission is encrypted (e.g., using TLS/SSL).
+    
+        \item \textbf{General Best Practice:} Always encrypt data
+        "over the wire" (during transmission) as a fundamental
+        security measure, irrespective of the specific network path.
+    \end{itemize}
+
+    \item \textbf{Data Management}
+    
+
+
+    \item \textbf{DataOps}
+    
+
+
+    \item \textbf{Orchestration.}
+    
+    \noindent
+    As data pipeline complexity grows, true orchestration is
+    necessary.
+    
+    By true orchestration, we mean a system capable of scheduling
+    complete task graphs rather than individual tasks.
+    
+    An orchestration can start each ingestion task at the appropriate
+    scheduled time. Downstream processing and transform steps begin
+    as ingestion tasks are completed. Further downstream, processing
+    steps lead to additional processing 
+    steps.
+
+    \item \textbf{Software Engineering}
+    
+    \noindent
+    The ingestion stage of the data engineering lifecycle heavily
+    involves software engineering principles. It often requires
+    building custom solutions ("plumbing") to connect with various
+    external systems at the edge of the data engineering domain.
+
+    Key points: 
+    \begin{itemize}
+        \item \textbf{Engineering Intensive:} The ingestion stage
+        often requires significant software engineering effort to
+        build custom interfaces ("plumbing") with external systems.
+    
+        \item \textbf{Underlying Complexity:} Ingestion systems
+        themselves can be very complex, potentially involving large
+        open-source frameworks (like Kafka) or custom solutions,
+        even if the user interaction is simplified.
+    
+        \item \textbf{Leverage Managed Tools:} Data engineers should
+        prioritize using managed data connectors and services
+        (e.g., Fivetran, Matillion, Airbyte) where available, as
+        they handle much of the complex "heavy lifting".
+    
+        \item \textbf{Apply Best Practices:} When custom ingestion
+        code is necessary, it's crucial to apply standard software
+        engineering best practices, including version control, code
+        reviews, and automated testing.
+    
+        \item \textbf{Decoupling:} Ingestion software should be
+        designed to be decoupled, avoiding monolithic structures
+        with tight dependencies between source systems, ingestion
+        logic, and destination systems.
+    \end{itemize}
+\end{itemize}
+
+
+
+
+

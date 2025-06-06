@@ -1,0 +1,459 @@
+% Fundamentals of Data Engineering
+\section{Designing Good Data Architecture}
+Successful data engineering is built upon rock-solid data architecture.
+Good data architecture provides seamless capabilities across every
+step of the data lifecycle and undercurrent
+\footnote{
+    Before giving a definition of data architecture,
+    it is useful to understand the context of Enterprise Architecture
+    (EA).
+
+    The objective of EA is to help organizations align their business
+    goals with the IT infrastructure and processes.
+
+    EA is a business function concerned with the design and execution
+    of systems to support the change in the enterprise, achieved
+    by flexible and reversible decisions reached through careful
+    evaluation of trade-offs.
+
+    Architects are not simply mapping out IT processes and vaguely
+    looking toward a distant, utopian future; they actively solve
+    business problems and create new opportunities.
+
+    Technical solutions exist not for their own sake but in support
+    of business goals.
+    
+    Architects identify problems in the current state (poor data
+    quality, scalability limits, money-losing lines of business),
+    define desired future states (agile data-quality improvement,
+    scalable cloud data solutions, improved business processes),
+    and realize initiatives through execution of small, concrete steps.
+}.
+
+
+
+
+
+\subsection{What Is Data Architecture?}
+There is no general consensus on a satisfactory definition of 
+Data Architecture. But, there are pragmatic and domain-specific,
+working definitions for data architecture that work for companies of
+vastly different scales, business processes, and needs.
+
+A good working definition of Data Architecture is as follows.
+Data Architecture is a subset of enterprise architecture, inheriting
+its properties: processes, strategy, change management, and evaluating
+trade-offs.
+
+Here are a couple of definitions of data architecture that influence
+our definition:
+\begin{itemize}
+    \item \textbf{TOGAF.}
+    
+    \noindent
+    \begin{verbatim}
+        A description of the structure and interaction of the
+        enterprise's major types and sources of data,
+        logical data assets, physical data assets,
+        and data management resources.
+    \end{verbatim}
+
+
+    \item \textbf{DAMA DMBOK.}
+    
+    \noindent
+    \begin{verbatim}
+        Identifying the data needs of the enterprise (regardless of
+        structure) and designing and  maintaining the master
+        blueprints to meet those needs. Using master blueprints to
+        guide data integration, control data assets, and align data
+        investments with business strategy.
+    \end{verbatim}
+\end{itemize}
+
+Data architecture is the design of systems to support the evolving
+data needs of an enterprise, achieved by flexible and reversible
+decisions reached through a careful evaluation of trade-offs.
+
+
+
+\subsection*{How does data architecture fit into data engineering?}
+Data engineering architecture is the systems and frameworks
+that make up the key sections of the data engineering lifecycle.
+We'll use data architecture interchangeably with data engineering
+architecture.
+
+Other aspects of data architecture that you should be aware of are
+operational and technical.
+\begin{itemize}
+    \item \textbf{Operational architecture} encompasses the functional
+    requirements  of what needs to happen related to people, processes,
+    and technology
+    \footnote{
+        e.g. What business processes does the data serve?
+        How does the organization manage data quality?
+        What is the latency requirement from when the data is
+        produced to when it becomes available to query?
+    }.
+
+    \item \textbf{Technical architecture} outlines how data is
+    ingested, stored, transformed, and served along the data
+    engineering lifecycle
+    \footnote{
+        e.g. How will you move 10 TB of data every hour from a source
+        database to your data lake?
+    }.
+\end{itemize}
+In summary, operational architecture describes what needs to be done,
+and technical architecture details how it will happen.
+
+
+\subsection*{"Good" Data Architecture}
+Now that we have a working definition of data architecture, let's
+cover the elements of “good” data architecture.
+
+What do we mean by “good” data architecture?
+To paraphrase an old cliche, you know good when you see it.
+Good data architecture serves business requirements with a common,
+widely reusable set of building blocks while maintaining flexibility
+and making appropriate trade-offs
+\footnote{
+    In contrast, bad architecture is authoritarian and tries to cram
+    a bunch of one-size-fits-all decisions into a big ball of mud.
+
+    % http://www.laputan.org/mud/
+    Note that a big ball of mud architecture is a casually, even
+    haphazardly, structured system. Its organization, if one can
+    call it that, is dictated more by expediency than design.
+    Yet, its enduring popularity cannot merely be indicative of a
+    general disregard for architecture. 
+}.
+
+Good data architecture is flexible and easily maintainable. Businesses
+and their use cases for data are always evolving. Agility is the
+foundation for good data architecture; it acknowledges that the world
+is fluid.
+
+
+
+
+% Fundamentals of Data Engineering, 2022
+\subsection{Principles of Good Data Architecture}
+
+\begin{enumerate}
+    \item \textbf{Choose Common Components Wisely.}
+    
+    \noindent
+    Common components can be anything that has broad applicability
+    within an organization. Common components include object storage,
+    version-control systems, observability, monitoring and
+    orchestration systems, and processing engines.
+
+    Choose common components and practices that can be used widely
+    across an organization. When architects choose well and lead
+    effectively, common components become a fabric facilitating team
+    collaboration and breaking down silos.
+
+    Common components must support robust permissions
+    and security to enable sharing of assets among teams while preventing unauthorized
+    access.
+
+
+    \item \textbf{Plan for Failure}
+    
+    \noindent
+    Modern hardware is highly robust and durable. Even so, any
+    hardware component will fail, given enough time. To build highly
+    robust data systems, you must consider failures in your designs.
+    Here are a few key terms for evaluating failure scenarios:
+    \begin{itemize}
+        \item \textbf{Availability} is the percentage of time an IT service
+        or component is in an operable state.
+        
+        \item \textbf{Reliability}  the system's probability of
+        meeting defined standards in performing its intended
+        function during a specified interval.
+        
+        \item \textbf{Recovery time objective} (RTO) is the maximum
+        acceptable time for a service or system outage.
+        
+        The RTO is generally set by determining the business impact of
+        an outage. An RTO of one day might be fine for an internal
+        reporting system. A website outage of just five minutes could
+        have a significant adverse business impact on an online
+        retailer.
+                
+        \item \textbf{Recovery point objective} 
+        The acceptable state after recovery. In data systems, data is
+        often lost during an  outage. In this setting, the recovery
+        point objective (RPO) refers to the maximum  acceptable data
+        loss.
+    \end{itemize}
+    Consider acceptable A,R, RTO, and RPO in designing for failure.
+    These will guide their architecture decisions as they assess
+    possible failure scenarios.
+
+
+    \item \textbf{Architect for Scalability}
+    
+    \noindent
+    Scalability in data systems encompasses two main capabilities:
+    \begin{enumerate}
+        \item scalable systems can scale up to handle significant
+        quantities of data.
+
+        \item scalable systems can scale down.
+    \end{enumerate}
+    An elastic system can scale dynamically in response to load,
+    ideally in an automated fashion. Some scalable systems can also
+    scale to zero: they shut down completely when not in use.
+
+    Note that deploying inappropriate scaling strategies can result
+    in overcomplicated systems and high costs.
+
+
+    \item \textbf{Architecture Is Leadership}
+    
+    \noindent
+    Data architects are
+    \footnote{
+        Data architects should be highly technically competent but
+        delegate most individual contributor work to others. Strong
+        leadership skills combined with high technical competence are
+        rare and extremely valuable.
+    }
+    responsible for technology decisions and architecture descriptions
+    and disseminating these choices through effective leadership and
+    training.
+
+    Note that leadership does not imply a command-and-control approach
+    to technology.
+
+    As a data engineer, you should practice architecture leadership
+    and seek mentorship from architects. Eventually, you may well
+    occupy the architect role yourself.
+
+
+    \item \textbf{Always Be Architecting}
+    
+    \noindent
+    Data architects constantly design new and exciting things in
+    response to changes in business and technology. They don't serve
+    in their role simply to maintain the existing state
+    
+    Per the EABOK, an architect's job is to develop deep knowledge of
+    the baseline architecture (current state), develop a target
+    architecture, and map out a sequencing plan to determine
+    priorities and the order of architecture changes.
+
+    We add that modern architecture should not be command-and-control
+    or waterfall but collaborative and agile. The data architect
+    maintains a target architecture and sequencing plans that change
+    over time.
+
+
+    \item \textbf{Build Loosely Coupled Systems}
+    
+    \noindent
+    For software architecture, a loosely coupled system has the
+    following properties:
+    \begin{enumerate}
+        \item Systems are broken into many small components.
+        \item These systems interface with other services through
+        abstraction layers
+        \footnote{
+            These abstraction layers hide and protect internal details
+            of the service, such as a database backend or internal
+            classes and method calls.
+        },
+        such as a messaging bus or an API.
+        \item As a consequence of property 2, internal changes to a
+        system component don't require changes in other parts
+        \footnote{
+            Details of code updates are hidden behind stable APIs.
+            Each piece can evolve and improve separately.
+        }.
+        \item As a consequence of property 3, there is no waterfall,
+        global release cycle for the whole system. Instead, each
+        component is updated separately as changes and improvements
+        are made.
+    \end{enumerate}
+    Notice that we are talking about technical systems. Let's
+    translate these technical characteristics into organizational
+    characteristics:
+    \begin{itemize}
+        \item Many small teams engineer a large, complex system. Each
+        team is tasked with  engineering, maintaining, and improving
+        some system components.
+
+        \item These teams publish the abstract details of their
+        components to other teams via API definitions, message
+        schemas, etc. Teams work together through loosely coupled
+        communication.
+
+        \item Each team can rapidly evolve and improve its component
+        independently of the work of other teams.
+
+        \item Teams release continuously during regular working hours
+        to make code changes and test them.
+    \end{itemize}
+
+
+    \item \textbf{Make Reversible Decisions}
+    
+    \noindent    
+    The data landscape is changing rapidly. Today's hot technology or
+    stack is tomorrow's afterthought. Popular opinion shifts quickly.
+    You should aim for reversible decisions
+    \footnote{
+        As Fowler wrote, “One of an architect's most important tasks
+        is to remove architecture by finding ways to eliminate
+        irreversibility in software designs.
+    },
+    as these tend to simplify your architecture and keep it agile.
+
+
+    \item \textbf{Prioritize Security}
+    
+    \noindent
+    Every data engineer must assume responsibility for the security
+    of the systems they build and maintain. We focus now on two main
+    ideas: zero-trust security and the shared responsibility security
+    model.
+
+    There is a responsibility to design a security model for the
+    applications and data and leverage cloud capabilities to realize
+    this model.
+
+
+    \item \textbf{Embrace FinOps}
+    
+    \noindent
+    FinOps (Financial Operations) is a framework that helps
+    organizations manage cloud financials effectively by fostering
+    collaboration between engineering, finance, and business teams.
+    It focuses on optimizing cloud spending while maintaining
+    performance and innovation.
+\end{enumerate}
+
+
+
+%GPT
+\subsection{Key Components of Data Architecture}
+
+\begin{itemize}
+    \item \textbf{Data Sources}: Systems that generate or capture
+    data, such as databases, applications, IoT devices, and
+    external APIs.
+
+    \item \textbf{Data Storage}: Solutions like data lakes, data
+    warehouses, and databases where data is stored based on its
+    type, structure, and usage.
+
+    \item \textbf{Data Integration}: Processes and tools (ETL/ELT)
+    that consolidate data from multiple sources into a unified view.
+
+    \item \textbf{Data Modeling}: Designing data structures
+    (conceptual, logical, and physical models) to represent and
+    organize data efficiently.
+
+    \item \textbf{Data Governance}: Policies and standards for data
+    quality, privacy, security, and compliance.
+
+    \item \textbf{Data Processing}: Workflows and pipelines that
+    transform raw data into usable formats for analytics and
+    applications.
+
+    \item \textbf{Data Access}: Mechanisms for querying and
+    accessing data securely, including APIs and data catalogs.
+\end{itemize}
+
+\section*{Why Is Data Architecture Important?}
+
+\begin{itemize}
+    \item \textbf{Improves Decision-Making}: Ensures reliable and timely data access.
+    \item \textbf{Scalability}: Facilitates handling growing data volumes efficiently.
+    \item \textbf{Cost Optimization}: Helps manage storage and processing resources effectively.
+    \item \textbf{Data Security}: Implements safeguards for data privacy and compliance.
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% Fundamentals of Data Engineering, 2022
+\subsection{Major Architecture Concepts}
+
+
+\subsection*{Domains and Services}
+
+
+\subsection*{Distributed Systems, Scalability, and Designing for Failure}
+
+
+\subsection*{Tight Versus Loose Coupling: Tiers, Monoliths, and Microservices}
+
+
+\subsection*{User Access: Single Versus Multitenant}
+
+
+\subsection*{Event-Driven Architecture}
+
+
+\subsection*{Brownfield Versus Greenfield Projects}
+
+
+
+
+
+
+
+\subsection{Examples and Types of Data Architecture}
+
+
+
+
+
+
+\subsection{Who's Involved with Designing a Data Architecture?}
+Data architecture isn't designed in a vacuum. Ideally, a data engineer
+will work alongside a dedicated data architect
+\footnote{
+    Bigger companies may still employ data architects, but those
+    architects will need to be heavily in tune and current with the
+    state of technology and data.
+
+    Gone are the days of ivory tower data architecture. In the past,
+    architecture was largely orthogonal to engineering. We expect this
+    distinction will disappear as data engineering, and engineering in
+    general, quickly evolves, becoming more agile, with less
+    separation between engineering and architecture.
+}.
+However, if a company
+is small or low in its level of data maturity, a data engineer might
+work double duty as an architect. Because data architecture is an
+undercurrent of the data engineering lifecycle, a data engineer
+should understand “good” architecture and the various types of data
+architecture.
+
+
+

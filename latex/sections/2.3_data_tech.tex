@@ -1,0 +1,263 @@
+\section{Choosing Technologies Across the Data Engineering Lifecycle}
+A lot of people confuse architecture and tools
+\footnote{
+    Architecture is strategic; tools are tactical.
+
+    Architecture is the high-level design, roadmap,
+    and blueprint of data systems that satisfy
+    the strategic aims for the business.
+
+    Architecture is the what, why, and when.
+    Tools are used to make the architecture a
+    reality; tools are the how.
+}.
+
+This chapter discusses our tactical plan for making
+technology choices once we have a strategic architecture
+blueprint. The following are some considerations for choosing
+data technologies across the data engineering lifecycle:
+
+\begin{itemize}
+    \item \textbf{Team size and capabilities}
+    
+    \noindent
+    The first thing you need to assess is your team's size
+    and its capabilities with technology.
+
+    There is a continuum of simple to complex technologies,
+    and a team's size roughly determines the amount of
+    bandwidth your team can dedicate to complex solutions
+    \footnote{
+        Sometimes, small data teams try to emulate extremely
+        complex technologies and practices. We call this
+        cargo-cult engineering, and it's generally a big
+        mistake that consumes a lot of valuable time and
+        money, often with little to nothing to show in
+        return.
+    }.
+    Dedicate your limited bandwidth to solving the complex
+    problems that directly add value to the business.
+
+
+    \item \textbf{Speed to market}
+    
+    \noindent
+    In technology, speed to market wins.
+    This means choosing the right technologies that help
+    you deliver features and data faster while maintaining
+    high-quality standards and security. It also means
+    working in a tight feedback loop of launching, learning,
+    iterating, and making improvements.
+    
+    Perfect is the enemy of good.
+    
+    Deliver value early and often.
+    
+    
+    \item \textbf{Interoperability}
+    
+    \noindent
+    Interoperability describes how various technologies or
+    systems connect, exchange information, and interact.
+
+    Rarely will you use only one technology or system.
+    When choosing a technology or system, you'll need to
+    ensure that it interacts and operates with other
+    technologies.
+
+    Always be aware of how simple it will be to connect
+    your various technologies across the data engineering
+    lifecycle.
+
+
+    \item \textbf{Cost optimization and business value}
+        
+    \noindent
+    Budgets and time are finite, and the cost is a major
+    constraint for choosing the right data architectures
+    and technologies.
+
+    Your organization expects a positive ROI from your
+    data projects, so you must understand the basic costs
+    you can control. We look at costs through three main
+    lenses: total cost of ownership, opportunity cost,
+    and FinOps.
+
+    \begin{itemize}
+        \item Total cost of ownership (TCO) is the total
+        estimated cost of an initiative, including
+        the direct and indirect costs of products and
+        services utilized
+        \footnote{
+            Direct costs can be directly attributed to an
+            initiative (e.g. Examples are the salaries of
+            a team working on the initiative or the AWS bill
+            for all services consumed).
+            
+            Indirect costs, also
+            known as overhead, are independent of the
+            initiative and must be paid regardless of where
+            they're attributed.
+
+            Apart from direct and indirect costs, how
+            something is purchased impacts the way costs are
+            accounted for. Expenses fall into two big groups:
+            capital expenses and operational expenses (opex).
+            Opex is gradual and spread out over time.
+            In general, opex allows for a far greater ability for
+            engineering teams to choose their software and hardware.
+        }.
+
+        \item Any choice inherently excludes other possibilities.
+        Total opportunity cost of ownership  (TOCO) is the cost of
+        lost opportunities that we incur in choosing a technology,
+        an architecture, or a process.
+
+        Data engineers often fail to evaluate TOCO when undertaking
+        a new project; in our opinion, this is a massive blind spot.
+        To minimize opportunity cost evaluate it with eyes wide open
+        \footnote{
+            How does Weighted Shortest Job First (WSJF) deal with
+            TOCO?
+        }.
+
+        \item The goal of FinOps is to fully operationalize
+        financial accountability and business value by
+        applying the DevOps-like practices of monitoring and
+        dynamically adjusting systems.
+
+        If it seems that FinOps is about saving money,
+        then think again. FinOps is about making money.
+        Cloud spend can drive more revenue, signal customer
+        base growth, enable more product and feature release
+        velocity, or even help shut down a data center.
+    \end{itemize}
+
+
+    \item \textbf{Today versus the future: immutable versus transitory technologies}
+            
+    \noindent
+    Given the reasonable probability of failure for many data
+    technologies, you need to consider how easy it is to
+    transition from a chosen technology. What are the barriers
+    to leaving?
+
+
+    \item \textbf{Location (cloud, on prem, hybrid cloud, multicloud)}
+    
+    \noindent
+    The principal places to run your technology stack are:
+    on premises, the cloud, hybrid cloud, and multicloud.
+
+
+    \item \textbf{Build versus buy}
+    
+    \noindent
+    We suggest investing in building and customizing when doing
+    so will provide a competitive advantage for your business.
+    Otherwise, stand on the shoulders of giants and use what's
+    already available in the market.
+
+
+    \item \textbf{Monolith versus Modular}
+    Monolithic and modular architectures offer contrasting approaches
+    to software and data engineering
+    \footnote{
+        The distributed monolith pattern is a distributed
+        architecture that still suffers from many of the
+        limitations of monolithic architecture.
+    }:
+    \begin{itemize}
+        \item Monoliths are self-contained, making them simpler to
+        manage and reason about, but they suffer from brittleness,
+        slow updates, and difficulty in scaling.
+
+        \item Modular systems, on the other hand, promote flexibility,
+        interoperability, and the ability to adopt best-of-breed
+        technologies, but they introduce complexity in orchestration
+        and integration.
+    \end{itemize}
+    While monolithic architectures work well for simplicity and stability,
+    modular architectures are better suited for rapidly evolving
+    technology landscapes.
+    
+
+    \item \textbf{Serverless versus servers}
+    Serverless computing allows developers to run applications without
+    managing the underlying infrastructure, offering cost efficiency and
+    scalability for the right use cases. However, it can become expensive
+    at scale and has limitations in execution time, networking, and
+    customization
+    
+    Traditional server-based approaches provide more control, power,
+    and flexibility, making them suitable for complex workloads.
+    
+    Containers bridge the gap, offering isolation, scalability, and
+    orchestration benefits. The choice between serverless and servers
+    depends on workload size, execution requirements, networking needs,
+    and cost considerations.
+
+
+    \item \textbf{Optimization, performance, and the benchmark wars}
+    
+    \noindent
+    Database benchmarks are often misleading, making unfair comparisons
+    between systems optimized for different use cases. Vendors frequently
+    manipulate results using small datasets, flawed cost comparisons,
+    and asymmetric optimizations. Buyers should critically evaluate
+    benchmarks by considering real-world data sizes, workload patterns,
+    and fair optimization strategies.
+
+    Key points:
+    \begin{itemize}
+        \item Be skeptical of benchmarks that don't align with real-world
+        data sizes and workloads.
+
+        \item Analyze the pricing model to ensure a fair cost comparison.
+        
+        \item Ensure both databases in a benchmark are optimized
+        appropriately for the use case.
+
+        \item Run independent tests with real data to validate claims
+        before choosing a database.
+    \end{itemize}
+
+
+    \item \textbf{The undercurrents of the data engineering lifecycle}
+    
+    \begin{enumerate}
+        \item \textbf{Data Management} is a broad area, and concerning
+        technologies, it isn't always apparent whether a technology
+        adopts data management as a principal concern.
+        
+        While evaluating the product, it helps to ask the company
+        about its data management practices. Here are  some sample
+        questions:
+        \begin{itemize}
+            \item How are you protecting data against breaches,
+            both from the outside and within?
+
+            \item What is your product's compliance with GDPR,
+            CCPA, and other data privacy regulations?
+
+            \item Do you allow me to host my data to comply with
+            these regulations?
+
+            \item How do you ensure data quality and that I'm
+            viewing the correct data in your solution?
+        \end{itemize}
+
+        \item \textbf{DataOps:} Problems will happen. They just will.
+        
+        When evaluating a new technology, how much control do you
+        have over deploying new code, how will you be alerted if
+        there's a problem, and how will you respond when there's
+        a problem?
+
+        \item \textbf{Data Architecture:}
+        The main goals are to avoid unnecessary lock-in, ensure
+        interoperability across the data stack, and produce high
+        ROI. Choose your technologies accordingly.
+    \end{enumerate}
+\end{itemize}
+
