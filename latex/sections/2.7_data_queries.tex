@@ -1,0 +1,1090 @@
+\section{Queries, Modeling, and Transformation}
+
+
+
+\subsection{What Is a Query?}
+A query allows you to retrieve and act on data.
+
+Queries are fundamental for retrieving and acting on
+data (especially tabular and semi-structured) in data
+engineering, science, and analysis. They represent the
+"Read" operation in CRUD but can also handle Create,
+Update, and Delete.
+
+Types of Query Language Commands:
+\begin{itemize}
+    \item \textbf{DDL (Data Definition Language):}
+    Defines database objects (e.g., CREATE, DROP
+    databases/tables).
+
+    \item \textbf{DML (Data Manipulation Language):}
+    Manipulates data within objects (e.g., SELECT,
+    INSERT, UPDATE, DELETE records).
+
+    \item \textbf{DCL (Data Control Language):}
+    Controls access permissions (e.g., GRANT, REVOKE).
+
+    \item \textbf{TCL (Transaction Control Language):}
+    Manages transactions (e.g., COMMIT, ROLLBACK).
+\end{itemize}
+
+
+When a query is executed it goes through:
+\begin{itemize}
+    \item Compilation
+    (parsing, semantic checks, permission verification).
+    
+    \item Conversion to efficient bytecode.
+
+    \item Optimization by the query optimizer
+    (reordering steps for efficiency).
+
+    \item Execution to produce results.
+
+    \item The Query Optimizer is crucial for performance,
+    analyzing factors like joins, indexes, and data scan
+    size to find the least expensive execution plan.
+\end{itemize}
+The Query Optimizer is crucial for performance, analyzing
+factors like joins, indexes, and data scan size to find
+the least expensive execution plan.
+
+
+Improving Query Performance:
+\begin{itemize}
+    \item \textbf{Optimize Joins:} rejoin data for frequent
+    analytics, simplify join logic, use indexes, be wary of
+    "row explosion" (many-to-many matches creating excessive
+    rows), and use CTEs for readability and potential
+    performance gains over subqueries/temp tables.
+    
+    \item \textbf{Use Explain Plans:} Understand the
+    optimizer's plan (EXPLAIN command) and monitor resource
+    usage (disk, memory, network, time, data scanned/shuffled,
+    concurrency).
+
+    \item \textbf{Avoid Full Table Scans:} Select only needed
+    columns/rows. Use pruning techniques like partitioning,
+    clustering, and indexes.
+
+    \item \textbf{Understand Commits & Consistency:} Know how
+    your database handles transactions (e.g., ACID compliance,
+    locking, write concurrency). Different databases (like
+    PostgreSQL, BigQuery, MongoDB) have varying models
+    affecting consistency and performance.
+
+    \item \textbf{Vacuum Dead Records:} Periodically remove
+    outdated records left by transactions to free space,
+    improve query plans, and clean indexes. Handling varies
+    significantly by database (e.g., auto-vacuum, time-travel
+    retention).
+ 
+    \item \textbf{Leverage Caching:} Utilize cached query
+    results for frequently run queries to improve speed and
+    reduce costs.
+\end{itemize}
+
+
+%! queries on streaming data
+
+
+
+
+
+
+
+
+
+
+\subsection{Data Modeling}
+Data modeling is the deliberate process of structuring data
+to coherently reflect an organization's real-world processes,
+business logic, definitions, and workflows.
+
+Key points:
+\begin{itemize}
+    \item \textbf{Often Overlooked but Critical:}
+    Data modeling is frequently neglected, yet it is an
+    essential process for creating useful data systems within
+    an organization.
+
+    \item \textbf{Definition:} It involves deliberately
+    structuring data to coherently reflect an organization's
+    real-world processes, business logic, definitions, and
+    workflows.
+
+    \item \textbf{Essential for Business Value:} Well-constructed
+    data models are crucial for making data useful and translating
+    it into impactful business outcomes and decisions (e.g., by
+    consistently defining key terms like "customer").
+
+    \item \textbf{Historical Context \& Resurgence:} While
+    techniques like normalization have existed for decades,
+    modeling became less fashionable with early data lakes and NoSQL
+    systems (sometimes leading to "data swamps"). Its importance is
+    now being recognized again, driven by needs for data governance
+    and quality.
+
+    \item \textbf{Consequences of Neglect:} Failing to model data
+    canlead to confusing, incoherent, redundant, or incorrect
+    data ("data swamps").
+
+    \item \textbf{Future Needs:} While
+    traditional modeling remains vital, new paradigms might be
+    required to fully address the needs of modern streaming data
+    and machine learning applications.
+\end{itemize}
+
+
+
+
+Data modeling involves progressing from abstract ideas to concrete
+database implementation through three main stages:
+\begin{enumerate}
+    \item \textbf{Conceptual Model:}
+    \begin{itemize}
+        \item Focuses on \textbf{business logic and rules}.
+        \item Describes the system's data entities (e.g., customers,
+        products, orders) and their relationships.
+        \item Often visualized using \textbf{Entity-Relationship
+        (ER) diagrams}.
+        \item Answers \textit{what} data the system contains.
+    \end{itemize}
+
+    \item \textbf{Logical Model:}
+    \begin{itemize}
+        \item Details \textit{how} the conceptual model will be
+        practically implemented.
+        \item Adds significantly more detail, including
+        \textbf{data types} for fields and the mapping of
+        \textbf{primary and foreign keys}.
+        \item Acts as a bridge between the conceptual idea and
+        the physical storage.
+    \end{itemize}
+
+    \item \textbf{Physical Model:}
+    \begin{itemize}
+        \item Defines the specific implementation
+        \textit{within a chosen database system}.
+        \item Includes details like specific database names,
+        schema names, table names, and technical
+        configurations.
+        \item Answers \textit{how} the data will be stored in a
+        specific technology.
+    \end{itemize}
+\end{enumerate}
+
+\begin{itemize}
+    \item \textbf{Stakeholder Involvement:} Successful data
+    modeling requires active participation from business
+    stakeholders from the start to capture correct definitions
+    and business goals, ensuring the data produced is high-quality
+    and useful.
+
+    \item \textbf{Data Grain:}
+    \begin{itemize}
+        \item Refers to the level of detail or resolution
+        at which data is stored (e.g., individual transaction
+        vs. daily summary).
+        \item It is strongly recommended to model data at the
+        
+        \textbf{lowest possible (most granular) level}. This
+        allows for flexibility, as granular data can always be
+        aggregated, but detail lost through aggregation cannot
+        be recovered.
+    \end{itemize}
+\end{itemize}
+
+
+
+\subsection*{Normalization}
+Normalization is a database modeling practice aimed at reducing
+data redundancy and improving data integrity (applying the DRY
+- Don't Repeat Yourself - principle).
+\begin{itemize}
+    \item Introduced by E.F. Codd with goals like eliminating
+    insertion/update/deletion anomalies and making the model
+    stable and informative
+    \footnote{
+        It's worth spending a moment to unpack a couple of terms we just threw at you. A
+        unique primary key is a single field or set of multiple fields that uniquely determines
+        rows in the table. Each key value occurs at most once; otherwise, a value would map
+        to multiple rows in the table. Thus, every other value in a row is dependent on (can
+        be determined from) the key. A partial dependency occurs when a subset of fields in
+        a composite key can be used to determine a nonkey column of the table. A transitive
+        dependency occurs when a nonkey field depends on another nonkey field.
+    }.
+
+    \item Involves progressing through sequential Normal Forms (NF):
+    \begin{itemize}
+        \item \textbf{Denormalized:} No normalization. Nested and
+        redundant data is allowed
+        \footnote{
+            Imagine that inside a table, in a value there is a nested 
+            table. This is an example of a denormalized table.
+        }.
+
+        \item \textbf{First normal form (1NF):} Normalization
+        (to first normal form) is a process where attributes with
+        non-simple domains are extracted to separate stand-alone
+        relations.
+
+        The extracted relations are amended with foreign keys
+        referring to the primary key of the relation which contained
+        it. The process can be applied recursively to non-simple
+        domains nested in multiple levels
+        \footnote{
+            As in the example of a denormalized table, we would
+            de-nest the table in possible several tables with
+            foreign keys with the objective that each row
+            represents individual records (non-nested).
+        }.
+        
+        \item \textbf{Second normal form (2NF):}
+        
+        A relation is in 2NF if:
+        \begin{enumerate}
+            \item It is 1NF.
+            
+            \item It does not have a key that is functionally 
+            dependent
+            \footnote{
+                Attribute B is functionally dependent on
+                attribute A (written as A -> B) if each value
+                of A is associated with exactly one value of B.
+            }
+            on any proper subset of any candidate key of the 
+            relation.
+        \end{enumerate}
+        
+        In other words, a relation (or table) is in 2NF if:
+        \begin{enumerate}
+            \item It is in 1NF and has a single attribute unique
+            identifier (UID).
+
+            \item It is in 1NF and has a multi-attribute UID,
+            and every regular attribute (not part of the UID)
+            is dependent on all attributes in the multi-attribute
+            UID, not just one attribute (or part) of the UID.
+        \end{enumerate}
+
+        To make a 1NF relation a 2NF relation, remove the
+        functionally dependent attributes in the partial
+        dependencies of the first normal form relation, and place
+        those partial dependency dependent attributes in a relation
+        where their corresponding determinant attributes are an
+        entire candidate key.
+        
+        Achieve 1NF and remove partial dependencies (where non-key
+        attributes depend on only part of a composite primary key).
+
+        \item \textbf{Third normal form (3NF):} Achieve 2NF and
+        remove transitive dependencies (where non-key attributes
+        depend on other non-key attributes). 
+    \end{itemize}
+    \item Higher forms exist but are less common.
+
+    \item Often achieved by splitting tables to isolate related data.
+    
+    \item While 3NF is a common standard, the optimal degree depends
+    on the use case; some denormalization might be chosen for
+    performance reasons (e.g., in OLAP systems).
+\end{itemize}
+
+
+
+
+
+
+
+
+
+\subsection*{Techniques for Modeling Batch Analytical Data}
+he fundamental goal is to transform raw data (which can be structured or
+semi-structured) from various sources into a structured format (rows and
+columns) suitable for analysis within a data lake or data warehouse.
+The primary techniques discussed are Inmon, Kimball, and Data Vault,
+though wide denormalized tables and even avoiding explicit modeling are
+also options. Often, these techniques can be combined.
+
+
+\begin{enumerate}
+    \item \textbf{Inmon Methodology (Top-Down, Normalized EDW)}
+    
+    \begin{itemize}
+        \item \textbf{Philosophy:} Create a centralized, integrated,
+        subject-oriented, nonvolatile, and time-variant Enterprise
+        Data Warehouse (EDW) as the single source of truth.
+
+        Department-specific analysis is served via data marts, which
+        are created from the central EDW. These data marts might be
+        denormalized (e.g., using star schemas) for easier querying
+        by specific departments (like sales or marketing).
+
+        \item \textbf{Structure:} The core EDW is highly normalized,
+        typically adhering to Third Normal Form (3NF). This minimizes
+        data redundancy and aims to closely mirror the normalized
+        structure of source systems.
+
+        \item \textbf{Process:} Relies heavily on ETL (Extract,
+        Transform, Load) before data enters the EDW. Data from
+        disparate sources is cleaned, integrated, and normalized
+        during this process.
+
+        \item \textbf{Pros:} Strong data integration, minimal data
+        redundancy, clear "single source of truth" for the enterprise.
+
+        \item \textbf{Cons:} Can be time-consuming and complex to
+        set up initially (requires building the comprehensive EDW first),
+        potentially less flexible to rapid changes in source systems or
+        business requirements compared to other methods.
+    \end{itemize}
+    
+
+    \item \textbf{Kimball Methodology (Bottom-Up, Dimensional Model)}
+    \begin{itemize}
+        \item \textbf{Philosophy:} Focuses on delivering business value
+        quickly by building the data warehouse iteratively from
+        department-specific data marts. The data warehouse effectively
+        becomes a collection of integrated data marts.
+
+        \item \textbf{Structure:} Based on the\textbf{dimensional model},
+        most commonly the \textbf{Star Schema}. Two fundamental concepts:
+        \begin{itemize}
+            \item \textbf{Fact Tables:}
+            Contain quantitative measurements or metrics of business events
+            (e.g., sales amount, quantity ordered). They are typically narrow
+            (few columns), long (many rows), append-only, and should be at the
+            lowest possible level of detail (granularity). They contain foreign
+            keys to dimension tables.
+
+            \item \textbf{Dimension Tables:}
+            Contain descriptive attributes that provide context to the facts
+            (e.g., customer details, product information, date attributes).
+            They are often denormalized (accepting some redundancy), wide
+            (many columns), and relatively short (fewer rows than facts).
+
+
+            \item \textbf{Slowly Changing Dimensions (SCDs):}
+            Techniques to handle changes in dimension attributes over time
+            (e.g., a customer changing address). Common types include:
+            Type 1: Overwrite the old value (no history);
+            Type 2: Add a new row for the new value, keeping the
+            old row with validity dates (most common for history tracking);
+            Type 3: Add a new column to store the previous value.
+
+            \item \textbf{Conformed Dimensions:}
+            Dimensions shared across multiple star schemas/fact tables to
+            ensure consistency.
+
+        \end{itemize}
+
+        \item \textbf{Pros:} Faster time-to-value for specific business areas,
+        generally easier for business users to understand and query
+        (star schema), often optimized for read performance due to fewer
+        joins than 3NF.
+
+        \item \textbf{Cons:} Can lead to data redundancy, potential for
+        inconsistent data definitions if conformed dimensions aren't managed
+        carefully, integration across the enterprise might require more
+        planning.
+    \end{itemize}
+
+
+
+
+    \item \textbf{Data Vault Methodology (Hybrid, Auditability & Flexibility)}
+
+    \begin{itemize}
+        \item \textbf{Philosophy:} Designed for agility, scalability, and
+        auditability, especially in environments with rapidly changing
+        source systems. It separates structural information (business
+        keys and relationships) from descriptive attributes. Loads raw
+        data with minimal transformation.
+
+        \item \textbf{Structure:} Consists of three main table types:
+        \begin{enumerate}
+            \item \textbf{Hubs:} Store unique business keys
+            (e.g., Customer ID, Product ID) and metadata like load
+            date and record source. Insert-only.
+
+            \item \textbf{Links:} Track relationships between business keys
+            (Hubs). Capture many-to-many relationships. Insert-only.
+
+            \item \textbf{Satellites:} Contain the descriptive attributes
+            (context) related to Hubs or Links, including historical changes.
+            They track data lineage and changes over time, connected via the
+            Hub/Link key and a load date.
+        \end{enumerate}
+
+        \item \textbf{Process:} Focuses on insert-only loading, preserving
+        the raw history from source systems. Business logic and transformations
+        are typically applied after the Data Vault, often when creating
+        downstream data marts or views for reporting
+        (which might use a Kimball-style model).
+
+        \item \textbf{Pros:} Highly adaptable to changes in source systems,
+        provides excellent auditability and traceability, supports parallel
+        data loading well.
+
+        \item \textbf{Cons:} Can result in a large number of tables and
+        require more complex joins for final analytical queries
+        (often necessitating an information mart layer on top),
+        can have a steeper learning curve.
+
+    \end{itemize}
+
+    \item \textbf{Wide Denormalized Tables}
+    \begin{itemize}
+        \item \textbf{Philosophy:} Leverage cheap cloud storage and
+        the performance of modern columnar databases by putting
+        potentially hundreds or thousands of fields into a single,
+        highly denormalized table.
+
+        \item \textbf{Structure:} One very wide table, often sparse
+        (many null values). Can include nested data types (like JSON).
+        Organized around one or more key columns defining the grain.
+
+        \item \textbf{Context:} Made practical by:
+        \begin{itemize}
+            \item Cheap cloud storage cost makes storing
+            redundant/sparse data viable.
+            \item Efficiently store and query wide, sparse tables
+            because they only read necessary columns, and nulls take
+            minimal space/query time. Schema evolution (adding columns)
+            is often simpler.
+        \end{itemize}
+
+        \item \textbf{Pros:} Simple to load data, can offer very fast
+        query performance for certain queries by eliminating joins,
+        flexible schema evolution.
+
+        \item \textbf{Cons:} Loss of clear business logic structure
+        within the model, potential redundancy, update operations
+        can be inefficient, can become unwieldy without governance.
+    \end{itemize}
+
+    \item \textbf{Wide Denormalized Tables}
+    \begin{itemize}
+        \item \textbf{Philosophy:} Avoid building a separate
+        analytical data structure; query operational databases directly.
+    
+        \item \textbf{Pros:} Quickest way to get initial answers
+        for simple questions.
+
+        \item \textbf{Cons:} High risk of impacting operational
+        system performance, difficult to ensure query consistency
+        and accuracy, lacks historical data integration, no single
+        view of the business, not scalable for complex analytics.
+        Usually a temporary or very limited solution.
+    \end{itemize}
+
+\end{enumerate}
+
+Key Considerations When Choosing:
+\begin{itemize}
+    \item \textbf{Business Needs:}  Are you focused on enterprise-wide
+    consistency (Inmon) or faster departmental reporting (Kimball)?
+
+    \item \textbf{Source System Volatility:} How often do your source
+    systems change (Data Vault excels here)?
+
+    \item \textbf{Reporting/Query Complexity:} How complex are the
+    typical analytical queries? (Kimball often simpler for end-users).
+
+    \item \textbf{Need for Auditability/Lineage:} Is tracing data history
+    critical (Data Vault)?
+    
+    \item \textbf{Development Resources/Timelines:} How quickly do you need
+    results? (Kimball/Wide Tables might be faster initially).
+    
+    \item \textbf{Technology Stack:} Cloud columnar databases make Wide
+    Tables more feasible.
+    
+    \item \textbf{Team Skills:} Familiarity with the different modeling paradigms.
+    
+\end{itemize}
+Ultimately, the choice often involves trade-offs between integration,
+flexibility, query performance, development speed, and maintainability.
+
+Modern approaches frequently blend techniques, such as using Data Vault
+for raw data integration and history, feeding Kimball-style marts for reporting.
+
+
+
+
+
+
+
+
+
+
+
+\subsection*{Modeling Streaming Data}
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Transformations}
+In data engineering, transformations
+\footnote{
+    The net result of transforming data is the ability to unify
+    and integrate data. Once data is transformed, the data can
+    be viewed as a single entity. But without transforming data,
+    you cannot have a unified view of data across the
+    organization.
+
+    —Bill Inmon
+}
+refer to the process of changing data from one format, structure,
+or value state to another. It's a crucial step in making raw data
+usable, consistent, and valuable for analysis, reporting,
+machine learning, or storage in a target system 
+(like a data warehouse or data lakehouse).
+
+A transformation differs from a query. A query retrieves the data
+from various sources based on filtering and join logic.
+A transformation persists the results for consumption by
+additional transformations or queries. These results may be stored
+ephemerally or permanently.
+
+Why are Transformations necessary? Because raw data collected from
+various sources often comes in different shapes and sizes and can be:
+\begin{itemize}
+    \item \textbf{Inconsistent:} Different systems may represent the
+    same thing differently (e.g. "USA", "U.S", etc.).
+
+    \item \textbf{Incomplete:} Missing values or fields.
+
+    \item \textbf{Incorrect:} Errors, typos, or invalid entries.
+    
+    \item \textbf{Poorly Structured:} Not organized in a way that's easy
+    to query or analyze.
+
+    \item \textbf{In the Wrong Format:} Dates stored as text, numbers
+    as strings, incompatible units, etc.
+
+    \item \textbf{Contains Sensitive Information:} Needs masking or
+    anonymization.
+
+    \item \textbf{Too Granular or Not Granular Enough:} Needs aggregation
+    or splitting.
+\end{itemize}
+
+Transformations critically rely on one of the major undercurrents
+in this book: orchestration. Orchestration combines many discrete
+operations, such as intermediate transformations, that store data
+temporarily or permanently for consumption by downstream
+transformations or serving. Increasingly, transformation pipelines
+span not only multiple tables and datasets but also multiple systems.
+
+
+
+\subsection*{Where Do Transformations Happen?}
+Transformations are a core part of data pipelines, most notably in:
+\begin{enumerate}
+    \item \textbf{ETL (Extract, Transform, Load):}
+    Data is extracted from sources, transformed in a staging area
+    or in-memory, and then loaded into the target system
+    (like a data warehouse or data mart).    
+
+    \item \textbf{ELT (Extract, Load, Transform):} Data is
+    extracted and loaded directly into the target system
+    (often a data lake or modern data warehouse),
+    and transformations are performed within the target
+    system using its processing power.
+\end{enumerate}
+
+In modern data lakehouse architectures, which combine features of data
+lakes and warehouses often using object storage, the strict distinction
+between ETL and ELT becomes fuzzy. Concepts like data federation and
+virtualization further blur the lines of where data resides and is
+processed.
+
+Data teams should choose the most appropriate technique (ETL or ELT)
+for each specific data pipeline based on its requirements.
+
+
+
+\subsection*{Common Types of Data Transformations.}
+Here are some specific actions that fall under the umbrella of transformations:
+\begin{itemize}
+    \item \textbf{Cleaning:}
+    \begin{itemize}
+        \item Handling null or missing values (imputing, removing).
+        \item Correcting errors and typos.
+        \item Filtering (e.g. removing duplicate records).
+        \item Standardizing formats (e.g., dates to 'YYYY-MM-DD', state names
+        to abbreviations).
+    \end{itemize}
+    
+    \item \textbf{Structuring / Reshaping:}
+    \begin{itemize}
+        \item Joining data from multiple tables or sources.
+        
+        \item Splitting columns
+        (e.g., separating full name into first and last name).
+
+        \item Pivoting (turning rows into columns) or
+        Unpivoting (turning columns into rows).
+
+        \item Changing data types (e.g., string to integer,
+        string to date).
+    \end{itemize}
+
+    \item \textbf{Enrichment:}
+    \begin{itemize}
+        \item Adding new calculated fields (e.g., calculating age
+        from date of birth, profit margin from sales and cost).
+
+        \item Appending data from external sources (e.g.,
+        adding demographic information based on zip codes).
+    \end{itemize}
+
+    \item \textbf{Aggregation:}
+    \begin{itemize}
+        \item Summarizing data (e.g., calculating total sales
+        per region, average customer spend).   
+
+        \item Grouping data based on certain attributes.
+    \end{itemize}
+
+    \item \textbf{Anonymization / Masking:}
+    Removing or obscuring personally identifiable information (PII)
+    or other sensitive data.
+\end{itemize}
+
+
+
+\subsection*{Batch Transformations}
+Batch Transformation processes operate on discrete, finite chunks
+of data, unlike streaming transformations which handle continuous
+data flow. Batch jobs typically run on a fixed schedule
+(e.g., hourly, daily) to update datasets for reporting, analytics,
+or machine learning models.
+
+Batch processing offers several advantages that make it a preferred
+choice for handling large volumes of data:
+\begin{itemize}
+    \item \textbf{Scalability:} Batch processing is highly scalable,
+    making it ideal for organizations dealing with enormous datasets.
+    As data volume grows, batch processing can handle the load
+    efficiently by processing data in manageable chunks.
+    
+    \item \textbf{Cost-Effectiveness:} By processing data in scheduled
+    or periodic batches, organizations can optimize resource
+    utilization, reducing costs associated with real-time processing
+    systems.
+
+    \item \textbf{Reduced Complexity:} Batch processing systems are
+    often simpler to design, implement, and maintain compared to
+    real-time systems. This simplicity makes it easier to troubleshoot
+    and debug potential issues.
+
+    \item \textbf{Fault Tolerance:} Batch processing can be made
+    fault-tolerant by implementing mechanisms to handle errors
+    gracefully. If a job fails during processing, it can be rerun
+    without affecting the entire system.
+
+    \item \textbf{Consistency:} Since batch processing operates on
+    fixed datasets, it ensures consistent results over time. This
+    consistency is essential for tasks like financial reporting or
+    data reconciliation.
+\end{itemize}
+
+%   python example
+% import pandas as pd
+
+% # Function to process each batch
+% def process_batch(batch_data):
+
+% # Perform data transformations here
+% processed_data = batch_data.apply(lambda x: x * 2)  # Example transformation: doubling the values return processed_data
+
+% # Read the CSV file in chunks
+% chunk_size = 100000  # Adjust the chunk size as per your system's memory constraints
+% csv_file = "large_data.csv"  # Replace with your CSV file's path
+% output_file = "processed_data.csv"  # Replace with the desired output file path
+
+% # Read the CSV file in batches and process each batch
+% for chunk in pd.read_csv(csv_file, chunksize=chunk_size):
+%     processed_chunk = process_batch(chunk)
+%     processed_chunk.to_csv(output_file, mode="a", header=False, index=False)
+
+
+
+\subsection*{Distributed Joins:}
+When joining large datasets that are spread across multiple
+machines (nodes) in a cluster (common in systems like Spark,
+MapReduce, BigQuery, Snowflake), the logical join operation
+must be broken down into smaller joins executed in
+parallel on these nodes.
+
+Two Main Distributed Join Strategies: 
+\begin{itemize}
+    \item \textbf{Broadcast Join:} This is used when one of
+    the tables being joined is small enough to fit entirely
+    in the memory of a single node. The system copies
+    ("broadcasts") this small table to every node
+    participating in the join. Each node then joins its
+    local partition of the large table with the complete
+    small table. This is highly efficient as it avoids
+    large-scale data movement (shuffling) across the network.
+    Query optimizers often try to enable broadcast joins by
+    filtering data early or reordering join operations.
+
+    \item \textbf{Shuffle Hash Join:} This strategy is
+    employed when both tables are too large to be broadcast.
+    Data from both tables is redistributed ("shuffled")
+    across the cluster nodes based on a hash calculated
+    from the join key(s). This ensures that all rows with
+    the same join key from both tables end up on the same
+    node. Each node then performs a hash join on the data
+    partitions it received. This method is significantly
+    more resource-intensive (network I/O, CPU, memory) due
+    to the costly shuffle step.
+\end{itemize}
+While Broadcast and Shuffle Hash are common, other distributed
+join strategies exist, such as Sort-Merge Join
+(which often also involves a shuffle phase to sort data by join
+key before merging). The query optimizer within the distributed
+system chooses the strategy based on table sizes, statistics,
+data distribution, and system configuration.
+
+In cloud environments where resources are paid for, the higher
+resource consumption (CPU, memory, network) of shuffle joins
+compared to broadcast joins translates directly to higher
+operational costs. Efficient join strategies save money.
+
+
+\subsection*{SQL and non-SQL for transformations.}
+The distinction between SQL-based and non-SQL transformation
+tools is becoming less meaningful, as SQL is now a
+"first-class citizen" in most major big data and streaming
+frameworks (Spark SQL, Hive, Flink SQL, Kafka SQL, Beam SQL).
+The more relevant distinction is now between SQL-only tools and
+tools supporting general-purpose programming languages
+(like Python/Scala with Spark).
+
+Although SQL is declarative (you define the desired end state)
+rather than procedural (defining step-by-step instructions),
+it's incorrect to assume it cannot build complex pipelines.
+Techniques like Common Table Expressions (CTEs), SQL scripting,
+and integration with orchestration tools allow for complex
+workflow construction.
+
+When to prefer code (e.g. Python/Spark/Scala) over SQL
+\footnote{
+    The choice between SQL and code can also be influenced
+    by team skills. SQL is generally more accessible to a
+    broader range of roles (including analysts), while
+    complex transformations in code require data
+    engineering or software development expertise.
+}:
+\begin{enumerate}
+    \item \textbf{Complexity:} If the transformation logic
+    is very difficult or awkward to express in SQL
+    (e.g., complex text manipulation like word stemming).
+
+    \item \textbf{Readability/Maintainability:}
+    If the SQL implementation becomes too convoluted and
+    hard to understand or modify.
+    
+    \item \textbf{Reusability/Libraries:}
+    When custom, reusable code libraries are needed.
+    SQL's native support for this is limited
+    (UDFs have drawbacks, though tools like dbt improve
+    SQL reusability).
+\end{enumerate}
+
+There is an Optimization Trade-off: Code-based frameworks
+like Spark give developers fine-grained control but also
+place the burden of optimization squarely on them.
+SQL engines, conversely, have built-in query optimizers
+(like Spark's Catalyst) that handle much of this
+automatically.
+
+
+\subsection*{Update Patterns}
+Updating persisted data from transformations is crucial but
+historically challenging, especially in data lakes which
+originally lacked robust update mechanisms. Modern data
+lakehouses address this, driven by practical needs and
+compliance requirements (like GDPR deletions).
+
+Update Patterns:
+\begin{itemize}
+    \item \textbf{Truncate and Reload:} The simplest
+    pattern, delete all existing data in the target table
+    and reload it completely with the latest transformed
+    data.
+
+    \item \textbf{Insert Only:} Add new records without
+    altering old ones. The current state is often
+    determined at query time by finding the latest record
+    per key (computationally expensive) or managed using
+    views/materialized views. Frequent single-row inserts
+    are an anti-pattern for columnar databases;
+    batch/micro-batch loading is preferred.
+
+    \item \textbf{Delete:}  Removing data. Can be hard
+    delete (permanent removal, needed for
+    compliance/performance) or soft delete
+    (marking records as deleted). An insert deletion
+    variant adds a new record flagged as deleted,
+    fitting insert-only models but adding query complexity.
+    Deletes are generally expensive in columnar/file-based
+    systems.
+
+    \item \textbf{Upsert/Merge:} Updates existing records
+    if a key matches, inserts if no match (Upsert).
+    Merge adds the capability to delete records based on
+    conditions. This pattern, common in row-based databases,
+    is often problematic and resource-intensive in columnar
+    systems due to underlying mechanics.
+\end{itemize}
+
+Updates/deletes/merges are costly due to Copy-on-Write.
+Merging large batches can be performant, but frequent,
+small merges (e.g., near real-time CDC) often overwhelm
+columnar systems. Batching updates (e.g., hourly) is
+generally advisable. Effective partitioning and
+clustering strategies are vital for performance.
+Specialized features in systems like BigQuery
+(streaming buffer) and Druid (storage tiers)
+offer near real-time capabilities as alternatives.
+
+
+
+\subsection*{Schema Updates}
+Schema Evolution
+\footnote{
+    Schema Evolution usually refers to planned,
+    managed changes to a schema. Schema Drift
+    typically refers to unexpected or unmanaged
+    changes, often from external sources. Both 
+    necessitate robust handling strategies.
+}
+is inevitable. Data sources change,
+leading to unavoidable updates in data schemas
+(adding fields, changing types, etc.).
+
+While columnar databases make data updates
+more complex than row-based systems, they
+generally make schema updates (adding,
+deleting, renaming columns) technologically
+easier. Despite the tech, managing schema
+changes practically is difficult. 
+
+
+
+
+\subsection*{Data Wrangling}
+Data wrangling is described as the essential,
+often difficult, batch transformation process of
+cleaning messy, malformed source data into a structured,
+usable format. It's highlighted as a traditional pain
+point for data engineers, illustrated by the complex,
+iterative process of handling problematic EDI data
+(initial ingestion struggles, text parsing, anomaly
+discovery, gradual refinement).
+
+Data Wrangling Tools aim to simplify and automate
+wrangling. Positioned as "IDEs for malformed data"
+rather than just "no-code" tools, they offer benefits
+like: 
+\begin{itemize}
+    \item Visual interfaces for data profiling
+    (showing types, stats, distributions, outliers,
+    nulls).
+
+    \item Step-by-step recipe building for cleaning
+    actions (fixing types, splitting columns, joining).
+
+    \item Execution of these recipes at scale, often
+    leveraging backends like Apache Spark.
+
+    \item Iterative refinement based on errors
+    encountered during execution.
+
+    \item Freeing up engineers from tedious parsing
+    and potentially enabling analysts.
+
+    \item Engineers are encouraged to explore options
+    from cloud providers and third parties.
+\end{itemize}
+Data wrangling is fundamentally tied to improving Data Quality.
+The profiling features act as initial quality checks, and the
+transformation steps directly address identified quality issues
+(incorrect types, outliers, nulls, inconsistencies).
+Formal Data Quality rules can often be implemented as part of
+the wrangling recipe.
+
+
+\subsection*{Business logic and derived data}
+A primary function of data transformation is to encode
+complex business logic, typically in batch processes,
+resulting in derived data (data computed from other data).
+
+Calculating specialized business metrics involves
+intricate logic, potentially accounting for factors
+like fraud estimation, order flags, and various
+marketing cost attribution models.
+
+An interesting Proposed Solution involves centralizing
+business logic definitions within a Metrics Layer.
+This layer allows analysts to build reports using
+predefined, governed metrics. The layer itself
+generates the complex underlying queries, sending
+them to the data warehouse for computation, thus
+separating logic definition from consumption.
+
+
+\subsection*{MapReduce}
+
+
+
+
+
+
+
+\subsection*{Materialized Views, Federation, and Query Virtualization}
+
+
+\subsection*{Views}
+A database view
+\footnote{
+    Views can be used for security (by restricting data
+    access), simplification (hiding complex joins/logic),
+    and presenting specific data states (e.g. a 
+    deduplicated view). 
+
+    The main drawback of views is the computation defined
+    in the view runs every time the view is queried,
+    which can be slow for complex views.
+}
+is a subset of a database and is based
+on a query that runs on one or more database tables.
+In practice, a view is just a query that references
+other tables. When queried, the database merges the
+view's logic with the user's query, optimizes,
+and executes it dynamically. Views don't store data
+themselves. 
+
+A \textbf{Materialized View (MV)} addresses the
+performance drawback of standard views by
+precomputing and physically storing the result set
+of the view's query. 
+
+The database manages the process of updating/refreshing
+the stored results when the underlying source tables
+change. Querying an MV reads the precomputed data,
+making it much faster. MVs act as database-managed
+transformation steps.
+
+Staleness vs. Performance Trade-off: Standard views
+always reflect the current data but can be slow.
+MVs offer fast query performance but might present
+slightly stale data depending on their refresh
+frequency and mechanism
+\footnote{
+    e.g.  ON COMMIT or ON DEMAND
+}.
+This is a key design trade-off.
+
+
+\subsection*{Federation}
+Federated Queries are a database feature allowing an
+OLAP system (like a data warehouse) to directly query
+and retrieve data from external sources, such as
+object storage (e.g., S3) or other databases
+(e.g., MySQL, PostgreSQL), 
+and get the result back as a temporary table.
+
+The main benefit of Federated Queries is that
+it improves the integration between data
+warehouses and data lake environments,
+allowing querying across boundaries.
+
+Example (Snowflake External Tables): Snowflake
+allows defining "external tables" that point
+to data in locations like S3. Metadata
+(location, format) is stored, but the data
+isn't ingested. When queried, Snowflake
+reads directly from the external source
+(S3) at that moment.
+
+
+\subsection*{Virtualization}
+Data Virtualization is closely related
+to federated queries but typically involves query
+systems (like Trino, formerly PrestoSQL, or Presto)
+that do not store data internally. They act purely
+as a query layer over various external data sources.
+
+Key Considerations:
+\begin{itemize}
+    \item Performance and the range of supported
+    external data sources are the most significant
+    factors when evaluating or using data
+    virtualization.
+
+    \item Ideal for organizations with data spread
+    across multiple disparate sources, providing
+    unified access.
+
+    \item Caution is needed when querying production
+    systems directly and frequently, as it can
+    negatively impact their performance
+    (the source is hit on each query).
+
+    \item Can be used effectively as part of data
+    ingestion/ETL pipelines (e.g., using Trino for
+    a scheduled data pull from a production DB into
+    data lake storage like S3).
+\end{itemize}
+
+While Federation and Virtualization are often used
+interchangeably, virtualization sometimes implies
+a broader capability, potentially including a
+unified semantic layer, data abstraction,
+and more complex integrations than simple query
+federation (which can be seen as a component technology).
+
+
+
+
+
+
+
+
+
+
+% \subsection*{Streaming Transformations and Processing}
+
+
+
+
+
+
+
+
+
+ 
+\subsection*{Undercurrents}
+
+
+
+
+
+
+
+

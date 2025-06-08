@@ -7,3 +7,5 @@
 *.log
 *.out
 *.asy
+*.toc
+*.gz

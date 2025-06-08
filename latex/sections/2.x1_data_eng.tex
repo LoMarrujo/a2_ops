@@ -1,5 +1,397 @@
+
+
+
+
+
+
+\subsection{Generation}
+A source system is the origin of the data used in the data engineering
+lifecycle
+\footnote{
+    e.g. a source system could be an IoT device, an application message
+    queue, or  a transactional database.
+}.
+A data engineer consumes data from a source system but doesn't
+typically own or control the source system itself. The data engineer
+needs to have a working understanding of the way source systems work,
+the way they generate data, the frequency and velocity of the data,
+and the variety of data they generate.
+
+\subsection*{Evaluating source systems: Key engineering considerations}
+The following is a starting set of evaluation questions of source systems
+that data engineers must consider:
+\begin{itemize}
+    \item What are the essential characteristics of the data source?
+    \item How is data persisted in the source system?
+    \item At what rate is data generated?
+    \item What level of consistency can data engineers expect from
+    the output data?
+    \item How often do errors occur?
+    \item Will the data contain duplicates?
+    \item Will some data values arrive late, possibly much later
+    than other messages produced simultaneously?
+    \item What is the schema of the ingested data?
+    \footnote{
+        Will data engineers need to join across several tables or
+        even several systems to get a complete picture of the data?
+    }
+    \item If schema changes (say, a new column is added), how is this
+    dealt with and  communicated to downstream stakeholders?
+    \item How frequently should data be pulled from the source system?
+    \item For stateful systems (e.g., a database tracking customer
+    account information), is  data provided as periodic snapshots or
+    update events from change data capture (CDC)?
+    \item Who/what is the data provider that will transmit the data
+    for downstream consumption?
+    \item Will reading from a data source impact its performance?
+    \item Does the source system have upstream data dependencies?
+    \item Are data-quality checks in place to check for late or
+    missing data?
+\end{itemize}
+
+
+
+
+
+\subsection{Storage}
+Choosing a storage solution is key to success in the rest of the
+data lifecycle, and it's also one of the most complicated stages
+of the data lifecycle for a variety of reasons:
+\begin{itemize}
+    \item data architectures in the cloud often leverage several
+    storage solutions.
+
+    \item few data storage solutions function purely as storage,
+    with many supporting complex transformation queries; even
+    object storage solutions may support powerful query capabilities
+
+    \item while storage is a stage of the data engineering
+    lifecycle, it frequently touches on other stages,
+    such as ingestion, transformation, and serving.
+\end{itemize}
+
+
+
+
+\subsection*{Evaluating storage systems: Key engineering considerations}
+Here are a few key engineering questions to ask when choosing a storage system for a
+data warehouse, data lakehouse, database, or object storage:
+\begin{itemize}
+    \item Is this storage solution compatible with the architecture's required write and read speeds?
+    \item Will storage create a bottleneck for downstream processes?
+    \item Do you understand how this storage technology works? Are you utilizing the storage system optimally or committing unnatural acts? For instance, are you applying a high rate of random access updates in an object storage system? (This is an antipattern with significant performance overhead.)
+    \item Will this storage system handle anticipated future scale? You should consider all capacity limits on the storage system: total available storage, read operation rate, write volume, etc.
+    \item Will downstream users and processes be able to retrieve data in the required service-level agreement (SLA)?
+    \item Are you capturing metadata about schema evolution, data flows, data lineage, and so forth? Metadata has a significant impact on the utility of data. Metadata represents an investment in the future, dramatically enhancing discoverability and institutional knowledge to streamline future projects and architecture changes.
+    \item Is this a pure storage solution (object storage), or does it support complex query patterns (i.e., a cloud data warehouse)?
+    \item Is the storage system schema-agnostic (object storage)? Flexible schema (Cassandra)? Enforced schema (a cloud data warehouse)?
+    \item How are you tracking master data, golden records, data quality, and data lineage for data governance? 
+    \item How are you handling regulatory compliance and data sovereignty? For example, can you store your data in certain geographical locations but not others?
+\end{itemize}
+
+
+\subsection*{Understanding data access frequency}
+Not all data is accessed in the same way. Retrieval patterns will greatly vary based on
+the data being stored and queried. This brings up the notion of the “temperatures” of
+data. Data access frequency will determine the temperature of your data:
+\begin{enumerate}
+    \item \textbf{Hot data} refers to data that is most frequently accessed
+    \footnote{
+        Hot data is commonly retrieved many times per day,
+        perhaps even several times per second
+    }.
+
+    \item \textbf{Lukewarm data} might be accessed every so
+    often—say, every week or month.
+
+    \item \textbf{Cold data} is seldom queried and is appropriate for storing in an archival system. Cold
+    data is often retained for compliance purposes or in case of a catastrophic failure in
+    another system.
+\end{enumerate}
+
+
+
+\subsection*{Selecting a storage system}
+What type of storage solution should you use? This depends on your use cases,
+data volumes, frequency of ingestion, format, and size of the data being ingested—
+essentially, the key considerations listed in the preceding bulleted questions. There
+is no one-size-fits-all universal storage recommendation. Every storage technology
+has its trade-offs.
+
+
+
+
+\subsection{Ingestion}
+After you understand the data source, the characteristics of the source system you're
+using, and how data is stored, you need to gather the data. The next stage of the data
+engineering lifecycle is data ingestion from source systems.
+
+In our experience, source systems and ingestion represent the most significant bottlenecks
+of the data engineering lifecycle. The source systems are normally outside
+your direct control and might randomly become unresponsive or provide data of
+poor quality. Or, your data ingestion service might mysteriously stop working for
+many reasons. As a result, data flow stops or delivers insufficient data for storage,
+processing, and serving.
+
+
+
+\subsection*{Key engineering considerations for the ingestion phase}
+When preparing to architect or build a system, here are some primary questions
+about the ingestion stage:
+\begin{itemize}
+    \item What are the use cases for the data I'm ingesting? Can I reuse this data rather than create multiple versions of the same dataset?
+    \item Are the systems generating and ingesting this data reliably, and is the data available when I need it?
+    \item What is the data destination after ingestion?
+    \item How frequently will I need to access the data?
+    \item In what volume will the data typically arrive?
+    \item What format is the data in? Can my downstream storage and transformation systems handle this format?
+    \item Is the source data in good shape for immediate downstream use? If so, for how long, and what may cause it to be unusable?
+    \item If the data is from a streaming source, does it need to be transformed before reaching its destination? Would an in-flight transformation be appropriate, where the data is transformed within the stream itself?
+\end{itemize}
+
+
+\subsection*{Batch versus streaming}
+Virtually all data we deal with is inherently streaming. Data is nearly always produced
+and updated continually at its source. Batch ingestion is simply a specialized and
+convenient way of processing this stream in large chunks—for example, handling a
+full day's worth of data in a single batch.
+
+Streaming ingestion allows us to provide data to downstream systems—whether
+other applications, databases, or analytics systems—in a continuous, real-time fashion.
+Here, real-time (or near real-time) means that the data is available to a downstream
+system a short time after it is produced (e.g., less than one second later). The
+latency required to qualify as real-time varies by domain and requirements.
+
+Batch data is ingested either on a predetermined time interval or as data reaches a
+preset size threshold. Batch ingestion is a one-way door: once data is broken into
+batches, the latency for downstream consumers is inherently constrained. Because of
+limitations of legacy systems, batch was for a long time the default way to ingest data.
+Batch processing remains an extremely popular way to ingest data for downstream
+consumption, particularly in analytics and ML.
+
+\subsection*{Key considerations for batch versus stream ingestion}
+The following
+are some questions to ask yourself when determining whether streaming ingestion is
+an appropriate choice over batch ingestion:
+\begin{itemize}
+    \item If I ingest the data in real time, can downstream storage systems handle the rate of data flow?
+    \item Do I need millisecond real-time data ingestion? Or would a micro-batch approach work, accumulating and ingesting data, say, every minute?
+    \item What are my use cases for streaming ingestion? What specific benefits do I realize by implementing streaming? If I get data in real time, what actions can I take on that data that would be an improvement upon batch?
+    \item Will my streaming-first approach cost more in terms of time, money, maintenance, downtime, and opportunity cost than simply doing batch?
+    \item Are my streaming pipeline and system reliable and redundant if infrastructure fails?
+    \item Am I getting data from a live production instance? If so, what's the impact of my ingestion process on this source system?
+    \item What tools are most appropriate for the use case? Should I use a managed service (Amazon Kinesis, Google Cloud Pub/Sub, Google Cloud Dataflow) or stand up my own instances of Kafka, Flink, Spark, Pulsar, etc.? If I do the latter, who will manage it? What are the costs and trade-offs?
+    \item If I'm deploying an ML model, what benefits do I have with online predictions and possibly continuous training?
+\end{itemize}
+As you can see, streaming-first might seem like a good idea, but it's not always
+straightforward; extra costs and complexities inherently occur. Many great ingestion
+frameworks do handle both batch and micro-batch ingestion styles. We think batch
+is an excellent approach for many common use cases, such as model training and
+weekly reporting. Adopt true real-time streaming only after identifying a business use
+case that justifies the trade-offs against using batch.
+
+
+
+
+
+
+
+
+\subsection{Transformation}
+After you've ingested and stored data, you need to do something with it. The next
+stage of the data engineering lifecycle is transformation, meaning data needs to be
+changed from its original form into something useful for downstream use cases.
+Typically, the transformation stage is where data begins to
+create value for downstream user consumption.
+
+Immediately after ingestion, basic transformations map data into correct types
+(changing ingested string data into numeric and date types, for example), putting
+records into standard formats, and removing bad ones.
+
+Later stages of transformation
+may transform the data schema and apply normalization. Downstream, we can apply
+large-scale aggregation for reporting or featurize data for ML processes.
+
+\subsection*{Key considerations for the transformation phase}
+When considering data transformations within the data engineering lifecycle, it helps
+to consider the following:
+\begin{itemize}
+    \item What's the cost and return on investment (ROI) of the transformation? What is
+    the associated business value?
+    \item Is the transformation as simple and self-isolated as possible?
+    \item What business rules do the transformations support?
+\end{itemize}
+
+Logically, we treat transformation as a standalone area of the data engineering lifecycle,
+but the realities of the lifecycle can be much more complicated in practice.
+
+Data featurization for ML is another data transformation process. Featurization
+intends to extract and enhance data features useful for training ML models. Featurization
+can be a dark art, combining domain expertise (to identify which features
+might be important for prediction) with extensive experience in data science
+
+
+
+
+\subsection{Serving Data}
+You've reached the last stage of the data engineering lifecycle. Now that the data has
+been ingested, stored, and transformed into coherent and useful structures, it's time
+to get value from your data. “Getting value” from data means different things to
+different users.
+
+Data has value when it's used for practical purposes. Data that is not consumed or
+queried is simply inert. Data vanity projects are a major risk for companies. Many
+companies pursued vanity projects in the big data era, gathering massive datasets in
+data lakes that were never consumed in any useful way.
+
+Data serving is perhaps the most exciting part of the data engineering lifecycle. This
+is where the magic happens. This is where ML engineers can apply the most advanced
+techniques. Let's look at some of the popular uses of data: analytics, ML, and reverse
+ETL.
+
+
+\subsection*{Analytics}
+Analytics is the core of most data endeavors. Once your data is stored and transformed,
+you're ready to generate reports or dashboards and do ad hoc analysis on the
+data.
+
+Analytics encompasses 3  main facets:
+\begin{itemize}
+    \item \textbf{Business intelligence.}
+    
+    \noindent
+    BI marshals collected data to describe a business's past and current
+    state. BI requires using business logic to process raw data.
+    Data is stored in a clean but fairly raw form,
+    with minimal postprocessing business logic. A BI system maintains a repository of
+    business logic and definitions. This business logic is used to query the data warehouse
+    so that reports and dashboards align with business definitions.
+
+
+    \item \textbf{Operational analytics.}
+    
+    \noindent
+    Operational analytics focuses on the fine-grained details of
+    operations, promoting actions that a user of the reports can act upon immediately
+    \footnote{
+        Operational analytics could be a live view of inventory or real-time dashboarding of
+        website or application health. In this case, data is consumed in real time, either
+        directly from a source system or from a streaming data pipeline.
+    }.
+    The types of
+    insights in operational analytics differ from traditional BI since operational analytics
+    is focused on the present and doesn't necessarily concern historical trends.
+
+
+    \item \textbf{Embedded analytics.}
+    
+    \noindent
+    With embedded analytics, the request rate for reports, and the corresponding burden
+    on analytics systems, goes up dramatically; access control is significantly more
+    complicated and critical.
+
+    Each customer must see their data and only their
+    data. An internal data-access error at a company would likely lead to a procedural
+    review. A data leak between customers would be considered a massive breach of trust,
+    leading to media attention and a significant loss of customers. Minimize your blast
+    radius related to data leaks and security vulnerabilities.
+
+\end{itemize}
+
+
+\subsection*{Machine Learning}
+The emergence and success of ML is one of the most exciting technology revolutions.
+Once organizations reach a high level of data maturity, they can begin to identify
+problems amenable to ML and start organizing a practice around it.
+
+The following are some considerations for the serving data phase specific to ML:
+\begin{itemize}
+    \item Is the data of sufficient quality to perform reliable feature engineering? Quality requirements and assessments are developed in close collaboration with teams consuming the data.
+    \item Is the data discoverable? Can data scientists and ML engineers easily find valuable data?
+    \item Where are the technical and organizational boundaries between data engineering and ML engineering? This organizational question has significant architectural implications.
+    \item Does the dataset properly represent ground truth? Is it unfairly biased?
+\end{itemize}
+While ML is exciting, our experience is that companies often prematurely dive into
+it. Before investing a ton of resources into ML, take the time to build a solid data
+foundation.
+
+
+
+\subsection*{Reverse ETL}
+Reverse ETL has long been a practical reality in data, viewed as an antipattern that
+we didn't like to talk about or dignify with a name. Reverse ETL takes processed data
+from the output side of the data engineering lifecycle and feeds it back into source
+systems.
+
+In reality, this flow is beneficial and often necessary;
+reverse ETL allows us to take analytics, scored models, etc., and feed these back into
+production systems or SaaS platforms.
+
+The jury is out on whether the term reverse ETL will stick. And the practice may
+evolve.
+
+
+
+
+
+
+
+
+
+
+\subsection{Major Undercurrents Across the DataEngineering Lifecycle}
+
+\subsection*{Security}
+\subsection*{Data Management}
+\subsection*{DataOps}
+\subsection*{Data Architecture}
+\subsection*{Orchestration}
+\subsection*{Software Engineering}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% \subsection*{Data governance}
+% \subsection*{Discoverability.}
+% \subsection*{Data accountability.}
+% \subsection*{Data quality.}
+% \subsection*{Metadata.}
+% \subsection*{Data modeling and design.}
+% \subsection*{Data lineage.}
+% \subsection*{Data integration and interoperability.}
+% \subsection*{Data lifecycle management.}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
 % Huyen, 2022. DMLS
-\section{Data Engineering}
 Large data systems, even without ML, are complex. It's easy to get
 lost in acronyms.  Industry standards, if there are any, evolve
 quickly, creating a dynamic and ever-changing environment. If you

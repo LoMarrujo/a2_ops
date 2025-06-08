@@ -1,0 +1,361 @@
+\section{Serving Data for Analytics, Machine Learning, and Reverse ETL}
+
+
+
+\subsection{General Considerations for Serving Data}
+Effective data serving requires addressing several overarching
+considerations to ensure data is valuable and impactful:
+trust, undestanding the use case and users, the data product 
+and the service, data definition and logic, and data mesh.
+
+\begin{itemize}
+    \item \textbf{Trust.}
+    
+    \noindent
+    Trust acts as a foundation and is the most critical element.
+    Middle and end users must have trust in the data's reliability
+    and accuracy
+    \footnote{
+        Trust is built through data validation, data observability,
+        proactive communication, and confirming data correctness with
+        stakeholders.
+    
+        Lost trust is hard to regain and can derail data projects.
+    }.
+
+    Establishing clear Service Level Agreements (SLAs so that
+    the users know what to expect regarding availability and
+    quality) and Service Level Objectives (SLOs act as
+    measurable targets for SLAs). Also, consistent communication
+    about performance against SLAs and SLOs is vital.
+
+
+    \item \textbf{Understanding Use Cases and Users.}
+    
+    \noindent
+    Data is most valuable when it drives action (strategic decisions,
+    personalized offers, automated processes like Reverse ETL).
+
+    Always ask who the user is, what action the data will trigger,
+    the expected ROI, and if the action can be automated.
+    Prioritize high-impact use cases.
+
+    Start with the end user and their goals, then design data
+    solutions to meet those specific needs, rather than focusing
+    on technology first.
+
+
+    \item \textbf{Data Products.}
+    
+    \noindent
+    A product that facilitates an end goal through the use of data
+    (e.g., a curated dataset, a dashboard, a recommendation engine).
+    Development involves collaboration between technology,
+    product, and business stakeholders. Understand the
+    "job to be done" for the user
+    \footnote{
+        Successful data products often generate more data through
+        usage, which can then be used to improve the product
+        further. Adoption hinges on utility and trust.
+    }.
+
+
+    \item \textbf{Self-Service vs. Curated Experiences.}
+    
+    \noindent
+    The aspiration is to empower end-users to directly access,
+    analyze, and build with data.
+
+    True self-service is hard to implement successfully.
+    Success depends on the right audience (e.g., data-savvy
+    executives or trained business users) and clearly defined
+    tasks they aim to accomplish with self-service tools.
+
+    Requires a careful balance between providing flexibility
+    and establishing guardrails to prevent misuse or incorrect
+    interpretations. Often, users prefer well-defined dashboards
+    or rely on analysts/data scientists for complex needs.
+
+
+    \item \textbf{Data Definitions and Logic.}
+    
+    \noindent
+    Data correctness includes universally understood data
+    definitions (e.g., what constitutes a "customer")
+    and clearly defined logic for calculations and metrics
+    (e.g., customer lifetime value, churn).
+
+    Avoid reliance on undocumented institutional knowledge.
+    Data definitions and logic should be formally documented
+    (e.g., in data catalogs, data models) and embedded within
+    data systems.
+
+
+    \item \textbf{Data Mesh.}
+    
+    \noindent
+    Data mesh
+    \footnote{
+        A data mesh is a modern approach to data architecture
+        that decentralizes data ownership and responsibility
+        to domain teams, treating data as a product and
+        applying product thinking to data.
+
+        The core principles of a data mesh are:
+        \begin{enumerate}
+            \item \textbf{Domain-oriented ownership.} Each domain
+            (e.g., sales, marketing, logistics) owns and
+            manages its own data. These teams are responsible
+            for producing, maintaining, and serving their own
+            datasets.
+
+            \item \textbf{Data as a product.} Data is treated
+            as a product with clear owners (product managers or
+            domain experts), SLAs, documentation, quality checks,
+            and usability standards. Consumers of the data are
+            treated like customers.
+
+            \item \textbf{Self-serve data infrastructure.}
+            A platform team provides tools and infrastructure
+            that enable domain teams to publish, discover, and
+            use data without needing deep technical expertise.
+            
+            \item \textbf{Federated computational governance.}
+            Governance policies (security, compliance,
+            interoperability, etc.) are applied in a decentralized
+            yet standardized way, allowing domain teams to work
+            autonomously but within shared guardrails.
+        \end{enumerate}
+    }
+    fundamentally alters data serving. Domain teams
+    become responsible for preparing and serving their data as
+    usable products for other teams across the organization.
+
+    Teams both produce data products for others and consume data
+    products from other domains for their own analytics,
+    dashboards, or embedded features. This requires a shift
+    towards peer-to-peer data exchange and responsibility.
+\end{itemize}
+
+
+
+\subsection{Data Serving Main Cases}
+The two main data-serving use cases are Analytics and Machine
+Learning (ML)
+\footnote{
+    The dictionary definition of analytics is:
+    a process in which a computer examines information using
+    mathematical methods in order to find useful patterns.
+    So, for some people, ML is a subset of analytics. But,
+    for other people it represent a more narrow process of
+    discovering, exploring, identifying, and making visible key
+    insights and patterns within data using statistical
+    methods, reporting, BI tools, and more.
+
+    
+}.
+
+Before you even serve data for analytics or ML, the first thing
+you need to do (which should sound familiar after reading the
+preceding section) is identify the end use case.
+
+
+
+
+\subsection{What a Data Engineer Should Know About ML}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Ways to Serve Data for Analytics and ML}
+Data engineers provide data to analysts and ML engineers
+through various methods, each with distinct characteristics:
+\begin{enumerate}
+    \item \textbf{File Exchange:} A fundamental method
+    involving passing data as files (CSVs, text, images).
+    
+    While simple (like email), it can lead to versioning
+    and access control issues. Scalable solutions involve
+    object storage within data lakes, often considered
+    a form of governed "data sharing".
+
+    \item \textbf{Databases (Primarily OLAP):} 
+    Databases like data warehouses offer structured,
+    high-performance access to data via queries
+    (typically SQL). They provide schemas, fine-grained
+    security, and support tools like BI platforms
+    (e.g., Tableau, Looker) and data science notebooks.
+    Data engineers manage performance, cost, and
+    workload isolation.
+
+    \item \textbf{Streaming Systems:}  Increasingly
+    important for serving real-time or near real-time
+    analytics and ML, often involving emitted metrics.
+    Operational analytics databases that combine
+    historical and up-to-the-second data play a
+    growing role.
+
+    \item \textbf{Query Federation (Data Virtualization):}
+    Enables querying data from multiple sources
+    (data lakes, RDBMS) directly without prior
+    centralization, using engines like Trino or Presto.
+    This offers flexibility for exploration but
+    requires caution with live production systems.
+
+    \item \textbf{Data Sharing (Modern Cloud Approach):}
+    Involves secure, governed data exchange via cloud platforms
+    (e.g., Snowflake, BigQuery, Redshift). Data consumers
+    directly query the shared data, with providers managing
+    access. This is key for data mesh and inter-organizational
+    collaboration.
+
+    \item \textbf{Semantic and Metrics Layers:}
+    These tools (e.g., Looker's LookML, dbt) focus on ensuring
+    query quality and consistency by centralizing business
+    logic and metric definitions. This helps provide accurate
+    and trusted answers to business questions.
+
+    \item \textbf{Serving Data in Notebooks (for Data Science):}
+    Data scientists commonly use notebooks (like Jupyter) to
+    connect to various data sources (APIs, databases, lakes)
+    for exploration, feature engineering, and model training.
+    Key challenges include:
+    \begin{itemize}
+        \item Secure Credential Handling for preventing
+        exposure of sensitive access keys is paramount.
+
+        \item Moving beyond local machine scaling limitations
+        by using cloud-based notebooks, distributed computing
+        (Spark, Dask, Ray), or managed ML platforms.
+        Data engineers are crucial in facilitating this
+        transition.
+    \end{itemize}
+\end{enumerate}
+
+
+\subsection*{Snowflake Data Serving}
+Here's a concise overview of the different ways to serve data
+from a Snowflake container or warehouse for training
+analytics/ML models, along with key considerations, pros,
+and cons:
+\begin{enumerate}
+    \item \textbf{Snowpark.}
+    
+    \noindent
+    Serves Data by processing data directly in Snowflake
+    using Python, Java, or Scala (DataFrame API) for
+    feature engineering and loading into ML models
+    (often within Snowflake or an external environment)
+    \footnote{
+        Considerations: Compute management, library
+        dependencies.
+    }.
+
+    \begin{itemize}
+        \item \textbf{Pros:} Reduced data movement
+        (security, cost, latency benefits),
+        scalable, unified environment.
+
+        \item \textbf{Cons:} Learning curve for SQL-users,
+        evolving feature set, potential for higher
+        compute costs if not managed.
+    \end{itemize}
+
+    
+    \item \textbf{Snowflake ML (Notebooks, Feature Store,
+    Model Registry, Cortex Functions).}
+    
+    \noindent
+    Serves Data by providing an integrated environment
+    within Snowflake for the ML lifecycle.
+    Notebooks access data directly; Feature Store
+    centralizes curated features; Cortex offers
+    SQL-based ML
+    \footnote{
+        Considerations: Feature maturity,
+        compute consumption for training.
+    }.
+    \begin{itemize}
+        \item \textbf{Pros:} End-to-end platform,
+        strong governance/security,
+        simplified workflows,
+        optimized data loading.
+        
+        \item \textbf{Cons:} Some features are newer,
+        potential vendor lock-in, compute costs.
+    \end{itemize}
+
+
+    \item \textbf{Snowflake Connectors (Python, Spark, JDBC/ODBC).}
+    
+    \noindent
+    Serves Data by enabling external applications and ML platforms
+    (e.g., Jupyter, SageMaker, Spark clusters)
+    to query and pull data from Snowflake
+    \footnote{
+        Considerations: Data volume, network bandwidth,
+        credential security
+    }.
+    \begin{itemize}
+        \item \textbf{Pros:}
+        Flexibility to use preferred external tools, mature technology,
+        integrates with existing workflows.
+        
+        \item \textbf{Cons:} Data movement
+        (egress costs, latency, security risks),
+        potential data staleness,
+        separate infrastructure management (e.g., for Spark).
+    \end{itemize}
+    
+
+    \item \textbf{External Functions.}
+    
+    \noindent
+    Serves Data for real-time/batch inference by
+    calling externally hosted ML models/APIs with
+    data from Snowflake. Less direct for serving
+    training data itself
+    \footnote{
+        Considerations: Security of API integration,
+        scalability of the external service.
+    }.
+    \begin{itemize}
+        \item \textbf{Pros:}
+        Leverages existing external models, language/framework agnostic,
+        SQL interface for ML.
+        
+        \item \textbf{Cons:} Primarily for inference,
+        added latency/overhead, complexity of managing external service.
+    \end{itemize}
+
+\end{enumerate}
+
+
+
+\subsection{Reverse ETL}
+
+
+
+
+
+
+\subsection{Undercurrents}
+
+
+

@@ -1,9 +1,119 @@
-\section{Create a Plan}
+\section{Planning}
 Many ML projects are doomed from the start due to a misalignment between product
 metrics and model metrics. More projects fail by producing good models that
 aren't helpful for a product rather than due to modeling difficulties.
 
-\
+
+% ML Eng, 2020. Burkov
+\subsection{Prioritization of Machine Learning Projects}
+The key considerations in the prioritization of a machine learning project,
+are impact and cost.
+
+
+\subsection*{Impact of Machine Learning}
+The impact of using machine learning in a broader engineering project is high
+when:
+\begin{enumerate}
+    \item machine learning can replace a complex part in your engineering
+    project, or
+    \item there's a great benefit in getting inexpensive (but probably
+    imperfect) predictions.
+\end{enumerate}
+
+Inexpensive and imperfect predictions can be valuable, for example, in a
+system that dispatches a large number of requests. Let's say many such
+requests are “easy” and can be solved quickly using some existing automation.
+The remaining requests are considered “difficult” and must be addressed manually.
+
+
+
+\subsection*{Cost of Machine Learning}
+Three factors highly influence the cost of a machine learning project:
+\begin{itemize}
+    \item the difficulty of the problem,
+    \item the cost of data, and
+    \item the need for accuracy
+    \footnote{
+        The need for high accuracy can translate into the requirement of
+        getting more data or training a more complex model, such as a unique
+        architecture of a deep neural network or a nontrivial ensembling
+        architecture.
+    }.
+\end{itemize}
+Getting the right data in the right amount can be very costly, especially if
+manual labeling is involved.
+
+When you think about the problem's difficulty, the primary considerations are:
+\begin{itemize}
+    \item whether an implemented algorithm or a software library capable of
+    solving the problem is available (if yes, the problem is greatly simplified),
+
+    \item whether significant computation power is needed to build the model or
+    to run it in the production environment.
+\end{itemize}
+
+The second driver of the cost is data. The following considerations have to be made:
+\begin{itemize}
+    \item can data be generated automatically (if yes, the problem is greatly simplified),
+    \item what is the cost of manual annotation of the data (i.e., assigning labels to unlabeled
+    examples),
+    \item how many examples are needed (usually, that cannot be known in advance, but can be
+    estimated from known published results or the organization's own experience).
+\end{itemize}
+
+Finally, one of the most influential cost factors is the desired accuracy of the model. The
+machine learning project's cost grows superlinearly with the accuracy requirement
+Low accuracy can also be a source of significant loss when the model is
+deployed in the production environment. The considerations to make:
+\begin{itemize}
+    \item how costly is each wrong prediction, and
+    \item what is the lowest accuracy level below which the model becomes impractical.
+\end{itemize}
+
+
+
+
+
+% ML Eng, 2020. Burkov
+\subsection{Estimating Complexity of a Machine Learning Project}
+There is no standard complexity estimation method for a machine learning project, other than
+by comparison with other projects executed by the organization or reported in the literature.
+
+
+
+\subsection*{The Unknowns}
+There are several major unknowns that are almost impossible to guess with confidence unless
+you worked on a similar project in the past or read about such a project. The unknowns are:
+\begin{itemize}
+    \item whether the required quality is attainable in practice,
+    \item how much data you will need to reach the required quality,
+    \item what features and how many features are necessary so that the model can learn and
+    generalize sufficiently,
+    \item how large the model should be (especially relevant for neural networks and ensemble
+    architectures), and
+    \item how long will it take to train one model (in other words, how much time is needed to
+    run one experiment) and how many experiments will be required to reach the desired
+    level of performance.
+\end{itemize}
+
+\subsection*{Nonlinear Progress}
+The progress of a machine learning project is nonlinear.
+
+The prediction error usually decreases fast in the beginning, but then the progress gradually
+slows down. Sometimes you see no  progress and decide to add additional features that could
+potentially depend on external databases or knowledge bases. While you are working on a new 
+feature or labeling more data (or outsourcing this task), no progress in model performance is
+happening.
+
+Because of this nonlinearity of progress, you should make sure that the product owner (or
+the client) understands the constraints and risks. Carefully log every activity and track the
+time it took. This will help not only in reporting, but also in the estimation of the complexity
+of similar projects in the future.
+
+
+
+
+
 
 \subsection{Measuring Success}
 We have three potential approaches for increasing the complexity of ML models
@@ -203,3 +313,156 @@ pipelines to consider:
     
     From the predictions, what can we improve?
 \end{enumerate}
+
+
+
+
+% ML Eng, 2020. Burkov
+\subsection*{Properties of a Successful Model}
+A successful model has the following four properties:
+\begin{itemize}
+    \item it respects the input and output specifications and the performance requirement,
+    \item it benefits the organization (measured via cost reduction, increased sales or profit),
+    \item it helps the user (measured via productivity, engagement, and sentiment),
+    \item it is scientifically rigorous.
+\end{itemize}
+
+
+
+
+
+% ML Eng, 2020. Burkov
+\subsection{Structuring a Machine Learning Team}
+
+
+
+
+% ML Eng, 2020. Burkov
+\subsection{Why Machine Learning Projects Fail}
+According to various estimates made between 2017 and 2020,
+from 74\% to 87\% of machine learning and advanced analytics
+projects fail or don't reach production. The reasons for
+a failure range from organizational to engineering.
+In this section, we consider the most impactful of them.
+
+
+
+\subsection*{Lack of Experienced Talent}
+Both data science and machine learning engineering are
+relatively new disciplines. There's still no standard
+way to teach them. Most organizations don't know how
+to hire experts in machine learning and how to compare
+them.
+
+A significant fraction of the workforce has superficial
+expertise in machine learning obtained on toy datasets
+in a classroom context. Many don't have experience with
+the entire machine learning project life cycle.
+
+
+
+\subsection*{Lack of Support by the Leadership}
+Scientists and software engineers often have different goals,
+motivations, and success criteria
+\footnote{
+    In a typical Agile organization, software engineering
+    teams work in sprints with clearly defined expected
+    deliverables and little uncertainty.
+
+    Scientists, on the other hand, work in high uncertainty
+    and move ahead with multiple experiments. Most of such
+    experiments don't result in any deliverable and, thus,
+    can be seen by inexperienced leaders as no progress.
+    Sometimes, after the model is built and deployed,
+    the entire process has to start over because the model
+    doesn't result in the expected increase of the metric
+    the business cares about. Again, this can lead to the
+    perception of the scientist's work by the leadership
+    as wasted time and resources.
+}
+
+Furthermore, in many organizations, leaders responsible for
+data science and artificial intelligence (AI), especially at
+the vice-president level, have a non-scientific or even
+nonengineering background. They don't know how AI works,
+or have a very superficial or overly optimistic understanding
+of it drawn from popular sources. They might have such a mindset
+that with enough resources, technical and human, AI can solve
+any problem in a short amount of time. When fast progress doesn't
+happen, they easily blame scientists or entirely lose interest
+in AI as an ineffective tool with hard-to-predict and uncertain
+results.
+
+Often, the problem lies in the inability of scientists to
+communicate the results and challenges to upper management.
+Because they don't share the vocabulary and have very different
+levels of technical expertise, even a success presented badly
+can be seen as a failure.
+
+This is why, in successful organizations, data scientists are
+good popularizers, while top-level  managers, responsible for
+AI and analytics, often have a technical or scientific background.
+
+
+
+\subsection*{Missing Data Infrastructure}
+Scientists usually obtain the data for training by using various
+ad-hoc scripts; they also use different scripts and tools to combine
+various data sources. Once the model is ready, it turns out that it's
+impossible, by using the available production infrastructure,
+to generate input examples for the model fast enough.
+
+
+
+\subsection*{Data Labeling Challenge}
+In most machine learning projects, analysts use labeled data.
+This data is usually custom, so labeling is executed specifically
+for each project. It is frequent that AI and data science teams
+label training data on their own and this results in a significant
+time spent by skilled data scientists on data labeling and labeling
+tool development. This is a major challenge for the effective execution
+of an AI project.
+
+
+
+\subsection*{Siloed Organizations and Lack of Collaboration}
+Data needed for a machine learning project often resides within an organization in different
+places with different ownership, security constraints, and in different formats. In siloed
+organizations, people responsible for different data assets might not know one another.
+Lack of trust and collaboration results in friction when one department needs access to the data
+stored in a different department. Furthermore, different branches of one organization often
+have their own budgets, so collaboration becomes complicated because no side has an interest
+in spending their budget helping to the other side.
+
+
+
+\subsection*{Technically Infeasible Projects}
+Because of the high cost of many machine learning projects (due to high expertise and infrastructure
+cost) some organizations, to “recoup the investment,” might target very ambitious
+goals: to completely transform the organization or the product or provide unrealistic return or
+investment. This results in very large-scale projects, involving collaboration between multiple
+teams, departments, and third-parties, and pushing those teams to their limits.
+
+As a result, such overly ambitious projects could take months or even years to complete;
+some key players, including leaders and key scientists, might lose interest in the project or
+even leave the organization. The project could eventually be deprioritized, or, even when
+completed, be too late to the market. It is best, at least in the beginning, to focus on achievable
+projects, involving simple collaboration between teams, easy to scope, and targeting a simple
+business objective.
+
+
+
+
+
+\subsection*{Lack of Alignment Between Technical and Business Teams}
+Many machine learning projects start without a clear understanding, by the technical team, of
+the business objective. Scientists usually frame the problem as classification or regression with
+a technical objective, such as high accuracy or low mean squared error. Without continuous
+feedback from the business team on the achievement of a business objective (such as an
+increased click-through rate or user retention), the scientists often reach an initial level of
+model performance (according to the technical objective), and then they are not sure if they
+are making any useful progress and whether an additional effort is worth it. In such situations,
+the projects end up being put on the shelf because time and resources were spent but the
+business team didn't accept the result.
+
+
