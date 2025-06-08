@@ -1,3 +1,125 @@
+\section{Introduction: What's MLOps?}
+\noindent
+Machine Learning Operations (MLOps) is a set of knowledge and practices that has
+the objective of streamlining and automating the machine learning lifecycle
+\footnote{
+    The ML lifecycle is a cyclical and iterative process that outlines the
+    key stages of developing a ML project. The exact definition of the ML
+    lifecycle varies slightly, the core stages are:
+    \begin{enumerate}
+        \item Business Goal Understanding and Project Scoping.
+        
+        \item ML Problem Framing.
+        
+        \item Data Processing
+        (Collection, Preprocessing, Feature Engineering).
+
+        \item Model Development
+        (Training, Evaluation, Experimentation).
+
+        \item Model Deployment.
+        
+        \item Model Monitoring and Maintenance.
+    \end{enumerate}
+    
+    %! insert figure of ML lifecycle.
+
+    We will go into more detail of the ML lifecycle ahead.
+    The ML lifecycle provides structure and clarity in order to improve the
+    chances of success of a ML project.
+}.
+
+
+MLOps brings the principles of DevOps (collaboration, automation, and CI/CD)
+into the world of ML. The main objective of MLOps is to make the process of 
+building, deploying, and managing ML systems more efficient, reliable, and
+scalable. To practice MLOps means to advocate for automation and monitoring
+at all steps of an ML system construction (including integration between
+components, testing, releasing, deployment, and infrastructure management).
+
+%! key note:
+%% Most of the time, the real challenge is not to build the model,
+%% the challenge is to build and integrated ML system and continuously operate 
+%% it in production. 
+
+
+\subsection{The Key Components of MLOps}
+MLOps can be broken down into several key components that work
+together to create a cohesive and automated system:
+\begin{itemize}
+    \item \textbf{Data Engineering:} enables working
+    with large volumes of data during the stages of model development,
+    continuous training, and API deployment.
+
+    In ML systems the common parts of data engineering are data
+    ingestion, transformation, loading, designing and implementing
+    robust data pipelines for model training and evaluation.
+
+    \item \textbf{Data Management:} involves versioning datasets,
+    ensuring data quality, and implementing robust data pipelines for
+    training and retraining models.
+
+    In ML systems the common parts of data management are data organization,
+    data verification, metadata management.
+
+    \item \textbf{Model Development, Training, and Evaluation:} offers
+    functionalities to efficiently execute algorithms for model training 
+    and performance evaluation. 
+    
+    In ML systems the common parts of model development are: configurations,
+    coding best practices, feature engineering, model analysis,
+    testing and debugging.
+
+    The common parts of model training are: environment provisioning,
+    distributed training environments, and hyperparameter tuning.
+
+    The common parts of model evaluation are: model analysis and business
+    matching, model performance, and interpretation of model output.
+
+    \item \textbf{Model Versioning and Packaging:} 
+    
+
+    
+    \item \textbf{Continuous Integration and Continuous Delivery (CI/CD):}
+
+
+
+    \item \textbf{Model Deployment and Serving:}
+    
+
+
+    \item \textbf{Model Monitoring and Logging:}
+    
+
+
+    \item \textbf{Governance and Compliance:}
+    
+
+
+    \item \textbf{Infrastructure and Tooling:}
+    
+
+\end{itemize}
+
+
+
+
+
+
+% https://www.mechanicalrock.io/blog/a-brief-overview-on-mlops-workflow-components
+% https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning
+% https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/well-architected-machine-learning-lifecycle.html
+% https://mlops-for-all.github.io/en/docs/introduction/component/
+
+
+
+
+
+
+
+
+
+\newpage
 % Ameisen, 2020
 \section{Finding the ML Approach}
 The ability to take a problem, estimate how best to solve it, 
@@ -39,6 +161,7 @@ goal in a way that minimizes the risks of users having a poor
 experience.
 
 % Designing MLS. Huyen, 2022.
+% ML Eng, 2020
 ML can be solve a lot of problems, but not all. There are two
 necessary questions to ask when considering to use ML:
 \begin{itemize}
@@ -54,6 +177,8 @@ an unknown value
 }.
 ML solutions shine if the problem:
 \begin{itemize}
+    \item too complex for coding,
+    \item is constantly changing but also somewhat stable,
     \item is repetitive,
     \item the cost of wrong predictions is cheap
     \footnote{
@@ -62,11 +187,13 @@ ML solutions shine if the problem:
         prediction.
     },
     \item is at scale,
-    \item is somewhat stable,
     \item can be divided and conquered with ML and other tools
     \footnote{
         e.g. a set of rules that can be programmed.
-    }.
+    },
+    \item is an unstudied phenomena,
+    \item has a simple objective that can be framed as a ML
+    problem.
 \end{itemize}
 ML should never be used if it is unethical to do so, or there are
 other simpler solutions, or if it is not and won't be cost effective.
@@ -91,10 +218,57 @@ upon. This makes the use of ML for automatically generating tax
 returns a dubious proposition.
 % \end{example}
 
-In summary, never use ML when you can solve your problem with a
-manageable set of deterministic rules, i.e., a set of rules that
-could be confidently written and that would not be too complex to
-maintain.
+
+
+% ML Eng, 2020
+\subsection*{When Not to Use Machine Learning}
+
+There are plenty of problems that cannot be solved using ML;
+it's hard to characterize all of them. Here we only consider
+several hints. You probably should not use machine learning
+when:
+\begin{itemize}
+    \item every action of the system or a decision made by it
+    must be explainable,
+    \item every change in the system's behavior compared to its
+    past behavior in a similar situation must be explainable,
+    \item the cost of an error made by the system is too high,
+    \item you want to get to the market as fast as possible,
+    \item you can solve the problem using traditional software
+    development at a lower cost,
+    \item a simple heuristic would work reasonably well,
+    \item the phenomenon has too many outcomes while you cannot
+    get a sufficient amount of examples to represent them
+    (like in video games or word processing software),
+    \item you build a system that will not have to be improved
+    frequently over time,
+    \item you can manually fill an exhaustive lookup table b
+    providing the expected output for any input (that is,
+    the number of possible input values is not too large,
+    or getting outputs is fast and cheap).
+\end{itemize}
+
+
+
+\subsection{Machine Learning Project Life Cycle}
+A machine learning project starts with understanding the business
+objective. Usually, a business analyst works with the client and
+the data analyst to transform a business problem into an
+engineering project.
+
+Overall, a machine learning project life cycle consists of the
+following stages: 
+\begin{enumerate}
+    \item goal definition;
+    \item data collection and preparation;
+    \item feature engineering;
+    \item model training;
+    \item model evaluation;
+    \item model deployment;
+    \item model serving;
+    \item model monitoring;
+    \item model maintenance.
+\end{enumerate}
 
 
 
